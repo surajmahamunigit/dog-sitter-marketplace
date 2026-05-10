@@ -1,0 +1,13 @@
+[project]
+name = "dog-sitter-marketplace"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.14"
+dependencies = [
+    "bcrypt<4.1",
+    "fastapi>=0.136.1",
+    "passlib[bcrypt]>=1.7.4",
+    "python-dotenv>=1.2.2",
+    "python-jose>=3.5.0",
+    "uvicorn[standard]>=0.46.0",
+]
