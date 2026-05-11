@@ -6,7 +6,7 @@ from typing import Optional
 from jose import JWTError, jwt
 from pydantic import BaseModel
 
-from app.core.config import ACCESS_TOKEN_EXPIRE_DAYS, ALOGORITHM, SECRET_KEY
+from app.core.config import ACCESS_TOKEN_EXPIRE_DAYS, ALGORITHM, SECRET_KEY
 
 
 class TokenData(BaseModel):
@@ -34,7 +34,7 @@ def create_access_token(user_id: str, role: str) -> str:
         "exp": datetime.now(timezone.utc) + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS),
     }
 
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALOGORITHM)
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def decode_access_token(token: str):
@@ -49,7 +49,7 @@ def decode_access_token(token: str):
     """
 
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALOGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("sub")
         role = payload.get("role")
 
