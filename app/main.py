@@ -5,7 +5,7 @@ Application entry point.
 
 from fastapi import FastAPI
 
-from app.routes import auth, users
+from app.routes import auth, bookings, dogs, sitters, users
 
 
 app = FastAPI(
@@ -16,6 +16,9 @@ app = FastAPI(
 
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(dogs.router)
+app.include_router(sitters.router)
+app.include_router(bookings.router)
 
 
 @app.get("/health")
