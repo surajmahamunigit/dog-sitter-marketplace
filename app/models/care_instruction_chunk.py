@@ -1,7 +1,9 @@
 """Care instruction chunks - split documents for pgvector similarity search"""
 
 import uuid
-from sqlalchemy import ForeignKey, text
+from datetime import datetime
+
+from sqlalchemy import ForeignKey, DateTime, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -19,6 +21,6 @@ class CareInstructionChunk(Base):
     )
     chunk_index: Mapped[int] = mapped_column(nullable=False)
     content: Mapped[str] = mapped_column(nullable=False)
-    created_at: Mapped[str] = mapped_column(
-        server_default=text("now()"), nullable=False
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("now()"), nullable=False
     )

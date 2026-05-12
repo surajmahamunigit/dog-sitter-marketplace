@@ -1,7 +1,9 @@
 """Review model - one review per booking, written by owner about sitter"""
 
 import uuid
-from sqlalchemy import CheckConstraint, ForeignKey, text
+from datetime import datetime
+
+from sqlalchemy import CheckConstraint, ForeignKey, DateTime, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -25,8 +27,8 @@ class Review(Base):
     )
     rating: Mapped[int] = mapped_column(nullable=False)
     body: Mapped[str] = mapped_column(nullable=False)
-    created_at: Mapped[str] = mapped_column(
-        server_default=text("now()"), nullable=False
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("now()"), nullable=False
     )
 
     __table_args__ = (

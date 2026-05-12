@@ -1,7 +1,9 @@
 """User model — owners, sitters, and admins share one table"""
 
 import uuid
-from sqlalchemy import text
+from datetime import datetime
+
+from sqlalchemy import text, DateTime
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -24,9 +26,9 @@ class User(Base):
     location: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     sitter_profile: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     ai_summary: Mapped[str | None] = mapped_column(nullable=True)
-    created_at: Mapped[str] = mapped_column(
-        server_default=text("now()"), nullable=False
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("now()"), nullable=False
     )
-    updated_at: Mapped[str] = mapped_column(
-        server_default=text("now()"), nullable=False
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("now()"), nullable=False
     )

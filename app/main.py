@@ -5,7 +5,7 @@ Application entry point.
 
 from fastapi import FastAPI
 
-from app.routes.auth import router as auth_router
+from app.routes import auth, users
 
 
 app = FastAPI(
@@ -14,7 +14,8 @@ app = FastAPI(
     version="0.1.0",
 )
 
-app.include_router(auth_router)
+app.include_router(auth.router)
+app.include_router(users.router)
 
 
 @app.get("/health")

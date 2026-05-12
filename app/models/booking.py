@@ -1,7 +1,9 @@
 """Booking model — the hub table connecting owner, sitter, and dog"""
 
 import uuid
-from sqlalchemy import CheckConstraint, ForeignKey, text
+from datetime import date, datetime
+
+from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -24,14 +26,14 @@ class Booking(Base):
         UUID(as_uuid=False), ForeignKey("dogs.id"), nullable=False
     )
     status: Mapped[str] = mapped_column(nullable=False, default="pending")
-    start_date: Mapped[str] = mapped_column(nullable=False)
-    end_date: Mapped[str] = mapped_column(nullable=False)
+    start_date: Mapped[date] = mapped_column(Date(), nullable=False)
+    end_date: Mapped[date] = mapped_column(Date(), nullable=False)
     total_price: Mapped[int] = mapped_column(nullable=False)
-    created_at: Mapped[str] = mapped_column(
-        server_default=text("now()"), nullable=False
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("now()"), nullable=False
     )
-    updated_at: Mapped[str] = mapped_column(
-        server_default=text("now()"), nullable=False
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("now()"), nullable=False
     )
 
     __table_args__ = (

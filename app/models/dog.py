@@ -1,7 +1,9 @@
 """Dog model — owned by a user, used in bookings and AI matching"""
 
 import uuid
-from sqlalchemy import ForeignKey, text
+from datetime import datetime
+
+from sqlalchemy import ForeignKey, DateTime, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -23,6 +25,6 @@ class Dog(Base):
     weight: Mapped[int] = mapped_column(nullable=False)
     profile_photo_url: Mapped[str | None] = mapped_column(nullable=True)
     dog_profile: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
-    created_at: Mapped[str] = mapped_column(
-        server_default=text("now()"), nullable=False
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=text("now()"), nullable=False
     )
