@@ -3,9 +3,9 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from app.core.config import config
-from app.models.booking import Booking, BookingStatus
-from app.models.payment import Payment, PaymentStatus
+from app.core import config
+from app.models.booking import Booking
+from app.models.payment import Payment
 from app.models.user import User
 
 
@@ -20,7 +20,7 @@ async def create_checkout_session(booking_id: UUID, db: AsyncSession) -> str:
 
     if booking is None:
         raise ValueError("Booking not found")
-    if booking.status != BookingStatus.pending:
+    if booking.status != "pending":
         raise ValueError("Booking is not in pending state")
 
     # Ask the Stripe to create the checkout session
@@ -71,13 +71,13 @@ async def handle_webhook(payload: bytes, sig_header: str, db: AsyncSession) -> N
         raise ValueError(f"Booking {booking_id} not found")
 
     # Update booking status
-    booking.status = BookingStatus.confirmed
+    booking.status = "confirmed"
 
     # Create the payment row
     payment = Payment(
         booking_id=booking.id,
         amount=booking.total_price,
-        status=PaymentStatus.completed,
+        status="completed",
         stripe_payment_id=stripe_payment_id,
     )
     db.add(payment)
@@ -124,14 +124,14 @@ async def refund_booking(booking_id: UUID, db: AsyncSession) -> int:
     payment = result.scalar_one_or_none()
     if not payment:
         raise ValueError("No payment found for this booking")
-    if payment.status == PaymentStatus.refunded:
+    if payment.status == "refunded":
         raise ValueError("Booking already refunded")
 
     # 2. Issue the refund via Stripe
     refund = stripe.Refund.create(payment_intent=payment.stripe_payment_id)
 
     # 3. Update payment status
-    payment.status = PaymentStatus.refunded
+    payment.status = "refunded"
     await db.commit()
 
     return refund.amount  # in cents
