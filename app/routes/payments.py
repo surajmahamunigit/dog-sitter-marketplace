@@ -17,7 +17,7 @@ from app.services import payment_service
 router = APIRouter(prefix="/payments", tags=["Payments"])
 
 
-@router.post("/create-checkout-ssession", response_model=CheckoutSessionResponse)
+@router.post("/create-checkout-session", response_model=CheckoutSessionResponse)
 async def create_checkout_session(
     data: CheckoutSessionRequest,
     current_user=Depends(require_owner),
