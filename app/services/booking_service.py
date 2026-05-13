@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.booking import Booking
 from app.models.dog import Dog
 from app.schemas.booking import BookingCreate, BookingStatusUpdate
+from app.services import payment_service
 
 
 # Valid status transition
@@ -88,6 +89,7 @@ async def update_booking_status(
     """
     Update booking status.
     Enforce valid transitions.
+    Trigger refund automatically if booking is cancelled.
 
     Raise ValueError if transition is not allowed.
     """
@@ -100,6 +102,14 @@ async def update_booking_status(
         )
 
     booking.status = data.status
+
+    # Trigger refund automatically on cancellation
+    if data.status == "cancelled":
+        try:
+            await payment_service.refund_booking(booking.id, db)
+        except ValueError:
+            # No payment found — booking was cancelled before payment, skip refund
+            pass
     await db.commit()
     await db.refresh(booking)
 
