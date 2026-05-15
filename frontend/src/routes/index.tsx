@@ -13,6 +13,8 @@ import SitterProfile from "../pages/SitterProfile";
 import Dashboard from "../pages/Dashboard";
 import Dogs from "../pages/Dogs";
 import AddDog from "../pages/AddDog";
+import BookingConfirmed from "../pages/BookingConfirmed"
+import BookingCancelled from "../pages/BookingCancelled"
 
 export default function AppRoutes() {
     return (
@@ -21,6 +23,8 @@ export default function AppRoutes() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/booking-confirmed" element={<BookingConfirmed />} />
+        <Route path="/booking-cancelled" element={<BookingCancelled />} />
         
 
         {/* Protected */}
