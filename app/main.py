@@ -1,18 +1,19 @@
 """
 Application entry point.
-
 """
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.routes import auth, users, dogs, sitters, bookings, payments
 
-from app.routes import auth, bookings, dogs, sitters, users
-from app.routes.payments import router as payments_router
+app = FastAPI()
 
-
-app = FastAPI(
-    title="Dog Sitter Marketplace",
-    description="Pet sitter marketplace with AI sitter matching and RAG chatbot",
-    version="0.1.0",
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)
@@ -20,13 +21,9 @@ app.include_router(users.router)
 app.include_router(dogs.router)
 app.include_router(sitters.router)
 app.include_router(bookings.router)
-app.include_router(payments_router)
+app.include_router(payments.router)
 
 
 @app.get("/health")
-def health_check():
-    """
-    App healthcheck endpoint - Public endpoint
-    """
-
+def health():
     return {"status": "ok"}
