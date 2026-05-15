@@ -7,7 +7,6 @@ import type { Sitter, Dog } from "../types";
 
 export default function BookingForm() {
     const { sitterId } = useParams<{ sitterId: string }>();
-    console.log("BookingForm render, sitterId:", sitterId, "url:", window.location.href);
     const [sitter, setSitter] = useState<Sitter | null>(null);
     const [dogs, setDogs] = useState<Dog[]>([]);
     const [loading, setLoading] = useState(true);
@@ -41,20 +40,20 @@ export default function BookingForm() {
     const rate = sitter?.sitter_profile?.rate_per_night ?? 150;
     const totalPrice = nights * rate;
 
-    const handleSubmit = async () => {
-        if (!selectedDogId || !startDate || !endDate) {
+const handleSubmit = async () => {
+    if (!selectedDogId || !startDate || !endDate) {
         setError("Please fill in all fields.");
         return;
-        }
-        if (new Date(startDate) < new Date(today)) {
-            setError("Start date cannot be in the past.");
+    }
+    if (new Date(startDate) < new Date(today)) {
+        setError("Start date cannot be in the past.");
         return;
-        }
+    }
 
-        setSubmitting(true);
-        setError(null);
+    setSubmitting(true);
+    setError(null);
 
-        try {
+    try {
             const booking = await createBooking({
                 sitter_id: sitterId!,
                 dog_id: selectedDogId,
@@ -62,11 +61,8 @@ export default function BookingForm() {
                 end_date: endDate,
             });
 
-            console.log("booking response:", booking);
-
             const checkoutUrl = await createCheckoutSession(booking.id);
-            console.log("checkout url:", checkoutUrl);
-
+            
             window.location.href = checkoutUrl;
         } catch {
             setError("Failed to create booking. Please try again.");

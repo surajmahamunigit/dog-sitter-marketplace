@@ -12,9 +12,6 @@ export default function SitterProfile() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    console.log("sitter id from url:", id);
-    console.log("sitter object:", sitter);
-
     useEffect(() => {
         if (!id) return;
 
