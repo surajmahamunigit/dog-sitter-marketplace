@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getSitters } from "../api/sitters";
+import { getSitterById } from "../api/sitters";
 import type { Sitter } from "../types";
 
 export default function SitterProfile() {
-    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { id } = useParams<{ id: string }>();
     const [sitter, setSitter] = useState<Sitter | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    console.log("sitter id from url:", id);
+    console.log("sitter object:", sitter);
 
     useEffect(() => {
         if (!id) return;
@@ -51,6 +54,13 @@ export default function SitterProfile() {
         </button>
 
         <h1 className="text-3xl font-bold">{sitter.name}</h1>
+
+        <button
+            onClick={() => navigate(`/book/${sitter.id}`)}
+            className="bg-black text-white px-6 py-2 rounded hover:bg-gray-800 mt-4 block"
+        >
+            Book {sitter.name}
+        </button>
 
         <p className="text-gray-600 mt-3">{sitter.bio ?? "No bio provided."}</p>
 

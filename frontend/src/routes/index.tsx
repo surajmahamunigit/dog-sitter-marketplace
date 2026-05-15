@@ -5,6 +5,7 @@ import Landing from "../pages/Landing";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import ProtectedRoute from "../components/ProtectedRoute";
+import BookingForm from "../pages/BookingForm";
 
 // Pages 
 import SitterList from "../pages/SitterList";
@@ -32,6 +33,9 @@ export default function AppRoutes() {
         <Route path="/dogs" element={<ProtectedRoute><Dogs /></ProtectedRoute>} />
         <Route path="/dogs/new" element={
             <ProtectedRoute><AddDog /></ProtectedRoute>
+        } />
+        <Route path="/book/:sitterId" element={
+            <ProtectedRoute><BookingForm /></ProtectedRoute>
         } />
         <Route path="/dashboard" element={
             <ProtectedRoute><Dashboard /></ProtectedRoute>
