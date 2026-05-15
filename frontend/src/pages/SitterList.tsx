@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getSitters, type Sitter } from "../api/sitters";
+import { getSitters } from "../api/sitters";
+import type { Sitter } from "../types";
 
 export default function SitterList() {
     const [sitters, setSitters] = useState<Sitter[]>([]);

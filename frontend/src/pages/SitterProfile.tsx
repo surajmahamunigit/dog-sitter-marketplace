@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getSitterById, type Sitter } from "../api/sitters";
+import { getSitters } from "../api/sitters";
+import type { Sitter } from "../types";
 
 export default function SitterProfile() {
     const { id } = useParams<{ id: string }>();

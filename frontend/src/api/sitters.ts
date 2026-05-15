@@ -1,23 +1,12 @@
-// src/api/sitters.ts
-import client from "./client";
+import apiClient from "./client";
+import type { Sitter } from "../types";
 
-export type Sitter = {
-    id: string;
-    name: string;
-    bio: string;
-    profile_photo_url: string | null;
-    sitter_profile: {
-        services: string[];
-        rate_per_night: number;
-    } | null;
-}
-
-export async function getSitters(): Promise<Sitter[]> {
-    const response = await client.get("/sitters/");
+export const getSitters = async (): Promise<Sitter[]> => {
+    const response = await apiClient.get<Sitter[]>("/sitters/");
     return response.data;
-}
+};
 
-export async function getSitterById(id: string): Promise<Sitter> {
-    const response = await client.get(`/sitters/${id}`);
+export const getSitterById = async (id: string): Promise<Sitter> => {
+    const response = await apiClient.get<Sitter>(`/sitters/${id}`);
     return response.data;
-}
+};
