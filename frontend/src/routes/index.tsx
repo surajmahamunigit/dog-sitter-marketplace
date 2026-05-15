@@ -1,7 +1,6 @@
 // src/routes/index.tsx
 
 import { Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
 import Landing from "../pages/Landing";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -12,6 +11,7 @@ import SitterList from "../pages/SitterList";
 import SitterProfile from "../pages/SitterProfile";
 import Dashboard from "../pages/Dashboard";
 import Dogs from "../pages/Dogs";
+import AddDog from "../pages/AddDog";
 
 export default function AppRoutes() {
     return (
@@ -30,6 +30,9 @@ export default function AppRoutes() {
             <ProtectedRoute><SitterProfile /></ProtectedRoute>
         } />
         <Route path="/dogs" element={<ProtectedRoute><Dogs /></ProtectedRoute>} />
+        <Route path="/dogs/new" element={
+            <ProtectedRoute><AddDog /></ProtectedRoute>
+        } />
         <Route path="/dashboard" element={
             <ProtectedRoute><Dashboard /></ProtectedRoute>
         } />
