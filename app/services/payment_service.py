@@ -37,8 +37,8 @@ async def create_checkout_session(booking_id: UUID, db: AsyncSession) -> str:
             }
         ],
         mode="payment",
-        success_url="http://localhost:3000/booking-confirmed",
-        cancel_url="http://localhost:3000/booking-cancelled",
+        success_url="http://localhost:5174/booking-confirmed",
+        cancel_url="http://localhost:5174/booking-cancelled",
         metadata={"booking_id": str(booking.id)},
     )
 

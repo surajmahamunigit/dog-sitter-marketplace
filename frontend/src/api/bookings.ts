@@ -14,9 +14,9 @@ export const createBooking = async (data: CreateBookingData): Promise<Booking> =
 };
 
 export const createCheckoutSession = async (bookingId: string): Promise<string> => {
-    const response = await apiClient.post<{ url: string }>(
+    const response = await apiClient.post<{ checkout_url: string }>(
         "/payments/create-checkout-session",
         { booking_id: bookingId }
     );
-    return response.data.url;
+    return response.data.checkout_url;
 };
