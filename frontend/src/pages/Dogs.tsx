@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMyDogs } from "../api/dogs";
+import { getMyDogs, deleteDog } from "../api/dogs";
 import type { Dog } from "../types";
 
 export default function Dogs() {
@@ -15,6 +15,15 @@ export default function Dogs() {
         .catch(() => setError("Couldn't load your dogs."))
         .finally(() => setLoading(false));
     }, []);
+
+    const handleDelete = async (id: string) => {
+        try {
+                await deleteDog(id);
+                setDogs(dogs.filter(dog => dog.id !== id));
+        } catch {
+            setError("Failed to delete dog. Please try again.");
+        }
+    };
 
     if (loading) return <p className="p-8">Loading...</p>;
     if (error) return <p className="p-8 text-red-500">{error}</p>;
@@ -42,7 +51,7 @@ export default function Dogs() {
                     <p className="text-sm text-gray-500">{dog.breed} · {dog.age} yrs · {dog.weight} lbs</p>
                 </div>
                 <button
-                    onClick={() => {/* delete — wiring next step */}}
+                    onClick={() => handleDelete(dog.id)}
                     className="text-red-500 text-sm hover:underline"
                 >
                     Delete
