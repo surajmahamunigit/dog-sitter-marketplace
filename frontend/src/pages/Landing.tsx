@@ -8,37 +8,6 @@ export default function Landing() {
     return (
         <div className="min-h-screen bg-white">
 
-        {/* Navbar */}
-        <nav className="flex items-center justify-between px-8 py-5 border-b border-gray-100">
-            <span className="text-xl font-bold text-blue-600">PawSitter</span>
-            <div className="flex gap-4">
-            {isAuthenticated ? (
-                // Show dashboard link if already logged in
-                <Link
-                to="/dashboard"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                >
-                Go to dashboard
-                </Link>
-            ) : (
-                // Show login + register if not logged in
-                <>
-                <Link
-                    to="/login"
-                    className="text-gray-600 px-4 py-2 rounded-lg text-sm font-medium hover:text-gray-900 transition-colors"
-                >
-                    Sign in
-                </Link>
-                <Link
-                    to="/register"
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
-                >
-                    Get started
-                </Link>
-                </>
-            )}
-            </div>
-        </nav>
 
         {/* Hero section */}
         <div className="max-w-3xl mx-auto text-center px-8 pt-24 pb-16">

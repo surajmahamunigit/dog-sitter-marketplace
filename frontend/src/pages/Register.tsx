@@ -11,7 +11,7 @@ export default function Register() {
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
 
-    const { setToken } = useAuth()
+    const { setToken, setUser } = useAuth()
     const navigate = useNavigate()
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -20,14 +20,20 @@ export default function Register() {
         setLoading(true)
 
         try {
-        await client.post('/auth/register', { name, email, password, role })
-        const loginResponse = await client.post('/auth/login', { email, password })
-        setToken(loginResponse.data.access_token)
-        navigate('/')
-        } catch (err: any) {
-        setError(err.response?.data?.detail ?? 'Registration failed. Please try again.')
-        } finally {
-        setLoading(false)
+            await client.post('/auth/register', { name, email, password, role })
+            const loginResponse = await client.post('/auth/login', { email, password })
+            setToken(loginResponse.data.access_token)
+
+            const userResponse = await client.get('/users/me', {
+                headers: { Authorization: `Bearer ${loginResponse.data.access_token}` }
+            })
+            setUser(userResponse.data)
+
+            navigate('/dashboard')
+            } catch (err: any) {
+                setError(err.response?.data?.detail ?? 'Registration failed. Please try again.')
+            } finally {
+                setLoading(false)
         }
     }
 

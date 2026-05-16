@@ -40,7 +40,7 @@ export interface Booking {
     owner_id: string;
     sitter_id: string;
     dog_id: string;
-    status: "pending" | "confirmed" | "completed" | "cancelled";
+    status: string;
     start_date: string;
     end_date: string;
     total_price: number;

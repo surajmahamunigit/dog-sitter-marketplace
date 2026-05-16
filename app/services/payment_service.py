@@ -37,8 +37,8 @@ async def create_checkout_session(booking_id: UUID, db: AsyncSession) -> str:
             }
         ],
         mode="payment",
-        success_url="http://localhost:5174/booking-confirmed",
-        cancel_url="http://localhost:5174/booking-cancelled",
+        success_url="http://localhost:5173/booking-confirmed",
+        cancel_url="http://localhost:5173/booking-cancelled",
         metadata={"booking_id": str(booking.id)},
     )
 
@@ -71,7 +71,7 @@ async def handle_webhook(payload: bytes, sig_header: str, db: AsyncSession) -> N
         raise ValueError(f"Booking {booking_id} not found")
 
     # Update booking status
-    booking.status = "confirmed"
+    booking.status = "pending"
 
     # Create the payment row
     payment = Payment(

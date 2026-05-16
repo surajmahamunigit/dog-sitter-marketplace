@@ -9,7 +9,7 @@ export default function Login() {
     const [error, setError] = useState<string | null>(null)
     const [loading, setLoading] = useState(false)
 
-    const { setToken } = useAuth()
+    const { setToken, setUser } = useAuth()
     const navigate = useNavigate()
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -17,18 +17,21 @@ export default function Login() {
     setError(null)
     setLoading(true)
 
-    try {
-        const response = await client.post('/auth/login', {
-        email,
-        password,
-        })
-        setToken(response.data.access_token)
-        navigate('/')
-    } catch (err: any) {
-        setError(err.response?.data?.detail ?? 'Login failed. Please try again.')
-    } finally {
-        setLoading(false)
-    }
+        try {
+            const response = await client.post('/auth/login', { email, password })
+            setToken(response.data.access_token)
+
+            const userResponse = await client.get('/users/me', {
+                headers: { Authorization: `Bearer ${response.data.access_token}` }
+            })
+            setUser(userResponse.data)
+
+            navigate('/dashboard')
+            } catch (err: any) {
+                setError(err.response?.data?.detail ?? 'Login failed. Please try again.')
+            } finally {
+                setLoading(false)
+        }
     }
 
     return (

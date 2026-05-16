@@ -20,3 +20,19 @@ export const createCheckoutSession = async (bookingId: string): Promise<string> 
     );
     return response.data.checkout_url;
 };
+
+export async function getMyBookings(): Promise<Booking[]> {
+    const response = await apiClient.get<Booking[]>("/bookings/");
+    return response.data;
+}
+
+export async function updateBookingStatus(
+    bookingId: string,
+    status: string
+): Promise<Booking> {
+    const response = await apiClient.patch<Booking>(
+        `/bookings/${bookingId}/status`,
+        { status }
+    );
+    return response.data;
+}
