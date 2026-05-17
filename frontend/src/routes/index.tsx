@@ -15,6 +15,7 @@ import Dogs from "../pages/Dogs";
 import AddDog from "../pages/AddDog";
 import BookingConfirmed from "../pages/BookingConfirmed"
 import BookingCancelled from "../pages/BookingCancelled"
+import EditDogProfile from "../pages/EditDogProfile"
 
 export default function AppRoutes() {
     return (
@@ -25,6 +26,14 @@ export default function AppRoutes() {
         <Route path="/register" element={<Register />} />
         <Route path="/booking-confirmed" element={<BookingConfirmed />} />
         <Route path="/booking-cancelled" element={<BookingCancelled />} />
+        <Route
+            path="/dogs/:id/edit-profile"
+            element={
+                <ProtectedRoute>
+                <EditDogProfile />
+                </ProtectedRoute>
+            }
+        />
         
 
         {/* Protected */}

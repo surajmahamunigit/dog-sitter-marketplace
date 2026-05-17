@@ -64,9 +64,15 @@ export default function Dashboard() {
                 ) : (
                 <ul className="space-y-2">
                     {dogs.map((dog) => (
-                    <li key={dog.id} className="border rounded p-3">
-                        {dog.name} — {dog.breed}, {dog.age} yrs
-                    </li>
+                        <li key={dog.id} className="border rounded p-3 flex justify-between items-center">
+                            <span>{dog.name} — {dog.breed}, {dog.age} yrs</span>
+                            <Link
+                                to={`/dogs/${dog.id}/edit-profile`}
+                                className="text-sm text-blue-600 hover:underline"
+                            >
+                                Edit Profile
+                            </Link>
+                        </li>
                     ))}
                 </ul>
                 )}
