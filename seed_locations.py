@@ -41,6 +41,7 @@ SITTER_UPDATES = [
         "new_name": "Betty Williams",
         "location": {"city": "Culver City", "lat": 34.0211, "lng": -118.3965},
     },
+    {"name": "speed", "location": {"city": "Hackney", "lat": 51.5450, "lng": -0.0553}},
 ]
 
 

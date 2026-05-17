@@ -16,6 +16,7 @@ export interface Sitter {
     } | null;
     ai_summary: string | null;
     profile_photo_url: string | null;
+    distance_miles?: number;
     }
 
 export interface Dog {
