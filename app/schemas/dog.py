@@ -24,8 +24,8 @@ class DogUpdate(BaseModel):
     All fields optional- only provided fields are updated.
     """
 
-    name: str
-    breed: str
+    name: str | None = None
+    breed: str | None = None
     age: int | None = Field(default=None, ge=0, le=30)
     weight: int | None = Field(default=None, ge=1, le=250)
     dog_profile: dict | None = None
