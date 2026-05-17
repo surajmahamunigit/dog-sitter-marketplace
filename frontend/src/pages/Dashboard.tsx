@@ -138,6 +138,12 @@ export default function Dashboard() {
         return (
             <div className="max-w-3xl mx-auto p-8 space-y-6">
             <h1 className="text-3xl font-bold">Sitter Dashboard</h1>
+            <Link
+                to="/sitter/edit-profile"
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
+            >
+                Edit Profile
+            </Link>
             <h2 className="text-xl font-semibold">Incoming Bookings</h2>
             {bookings.length === 0 ? (
                 <p className="text-gray-500">No bookings yet.</p>

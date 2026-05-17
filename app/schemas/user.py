@@ -28,3 +28,14 @@ class UserMeResponse(BaseModel):
     ai_summary: str | None = None
     created_at: datetime
     updated_at: datetime
+
+
+class UserUpdate(BaseModel):
+    """
+    payload for updating the users profile.
+    All fields optional - only provided fields are updated.
+    """
+
+    bio: str | None = None
+    location: dict | None = None
+    sitter_profile: dict | None = None

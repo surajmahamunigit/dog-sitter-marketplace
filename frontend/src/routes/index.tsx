@@ -16,6 +16,7 @@ import AddDog from "../pages/AddDog";
 import BookingConfirmed from "../pages/BookingConfirmed"
 import BookingCancelled from "../pages/BookingCancelled"
 import EditDogProfile from "../pages/EditDogProfile"
+import EditSitterProfile from "../pages/EditSitterProfile"
 
 export default function AppRoutes() {
     return (
@@ -53,6 +54,15 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={
             <ProtectedRoute><Dashboard /></ProtectedRoute>
         } />
+        <Route
+            path="/sitter/edit-profile"
+            element={
+                <ProtectedRoute>
+                <EditSitterProfile />
+                </ProtectedRoute>
+            }
+        />
         </Routes>
+        
     );
 }

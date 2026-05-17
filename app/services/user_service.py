@@ -16,3 +16,18 @@ async def get_user_by_id(db: AsyncSession, user_id: UUID) -> User | None:
 
     result = await db.execute(select(User).where(User.id == user_id))
     return result.scalar_one_or_none()
+
+
+async def update_user(db: AsyncSession, user: User, data: dict) -> User:
+    """
+    Apply partial update to the users record.
+    Only fields present in data will be updated.
+    """
+
+    for field, value in data.items():
+        setattr(user, field, value)
+
+    await db.commit()
+    await db.refresh(user)
+
+    return user
