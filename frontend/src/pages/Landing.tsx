@@ -13,10 +13,10 @@ export default function Landing() {
         <div className="max-w-3xl mx-auto text-center px-8 pt-24 pb-16">
             
             <h1 className="text-5xl font-bold text-gray-900 leading-tight mb-6 font-display">
-                Trusted dog sitters,<br />in your neighbourhood
+                Pet Care Reimagined
             </h1>
             <p className="text-xl text-gray-500 mb-10">
-            Find the perfect sitter for your dog. Book, pay, and stay updated — all in one place.
+            Experience a new era of pet ownership with PawSitter. Our AI-driven platform connects you with the perfect sitter, ensuring your furry friends are never alone.
             </p>
             <div className="flex gap-4 justify-center">
             <Link

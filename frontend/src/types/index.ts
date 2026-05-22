@@ -88,3 +88,18 @@ export interface Booking {
     end_date: string
     total_price: number
 }
+
+export interface SitterMatch {
+    sitter_id: string
+    rank: number
+    reasoning: string
+    sitter_name: string
+    nightly_rate: number
+    distance_miles: number
+}
+
+export interface MatchResponse {
+    dog_id: string
+    match_id: string
+    matches: SitterMatch[]
+    }

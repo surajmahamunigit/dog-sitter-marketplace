@@ -17,6 +17,8 @@ import BookingConfirmed from "../pages/BookingConfirmed"
 import BookingCancelled from "../pages/BookingCancelled"
 import EditDogProfile from "../pages/EditDogProfile"
 import EditSitterProfile from "../pages/EditSitterProfile"
+import MatchResults from '../pages/MatchResults'
+import EditOwnerProfile from '../pages/EditOwnerProfile'
 
 export default function AppRoutes() {
     return (
@@ -62,7 +64,12 @@ export default function AppRoutes() {
                 </ProtectedRoute>
             }
         />
+        <Route path="/matches/results" element={<ProtectedRoute><MatchResults /></ProtectedRoute>} />
+        <Route path="/owner/edit-profile" element={
+            <ProtectedRoute><EditOwnerProfile /></ProtectedRoute>
+        } />
         </Routes>
+        
         
     );
 }
