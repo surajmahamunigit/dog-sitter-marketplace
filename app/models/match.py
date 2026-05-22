@@ -1,7 +1,7 @@
 # app/models/match.py
 
 import uuid
-from sqlalchemy import Column, Integer, String, Text, JSON
+from sqlalchemy import Column, Integer, String, Text, JSON, Enum as SAEnum
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import DateTime
 from sqlalchemy.sql import func
@@ -21,6 +21,9 @@ class Match(Base):
     input_tokens = Column(Integer, nullable=True)
     output_tokens = Column(Integer, nullable=True)
     latency_ms = Column(Integer, nullable=True)
-    status = Column(String(20), nullable=False)  # "success" or "failed"
+    status = Column(
+        SAEnum("success", "failed", name="match_status", create_type=False),
+        nullable=False,
+    )
     error_message = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -36,6 +36,8 @@ class UserUpdate(BaseModel):
     All fields optional - only provided fields are updated.
     """
 
+    name: str | None = None
+    email: str | None = None
     bio: str | None = None
     location: dict | None = None
     sitter_profile: dict | None = None
