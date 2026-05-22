@@ -4,7 +4,7 @@ Application entry point.
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import auth, users, dogs, sitters, bookings, payments
+from app.routes import auth, users, dogs, sitters, bookings, payments, matches
 
 app = FastAPI()
 
@@ -25,6 +25,7 @@ app.include_router(dogs.router)
 app.include_router(sitters.router)
 app.include_router(bookings.router)
 app.include_router(payments.router)
+app.include_router(matches.router)
 
 
 @app.get("/health")
