@@ -36,3 +36,6 @@ STRIPE_CONNECT_CLIENT_ID = _require("STRIPE_CONNECT_CLIENT_ID")
 
 # Antropic
 ANTHROPIC_API_KEY: str = _require("ANTHROPIC_API_KEY")
+
+# OpenAI
+OPENAI_API_KEY: str = _require("OPENAI_API_KEY")
