@@ -1,0 +1,234 @@
+import pytest
+from unittest.mock import patch, MagicMock
+from httpx import AsyncClient
+
+from app.services.embedding_service import chunk_text
+
+
+#  Helper
+
+
+async def _register_and_login(client: AsyncClient, email: str, role: str) -> str:
+    await client.post(
+        "/auth/register",
+        json={
+            "email": email,
+            "password": "testpass123",
+            "name": "Test User",
+            "role": role,
+        },
+    )
+    response = await client.post(
+        "/auth/login",
+        json={
+            "email": email,
+            "password": "testpass123",
+        },
+    )
+    return response.json()["access_token"]
+
+
+#  Test 1: chunking
+
+
+def test_chunk_text_produces_chunks():
+    """Chunking returns a non-empty list with no empty strings."""
+    text = """Feed Bella half a cup of dry kibble twice a day.
+
+She has a chicken allergy so avoid any chicken-based treats.
+
+She takes one Apoquel pill hidden in peanut butter every morning.
+
+Make sure she has fresh water available at all times.
+
+She gets a 30 minute walk every afternoon."""
+
+    chunks = chunk_text(text)
+
+    assert len(chunks) > 0
+    assert all(len(c) > 0 for c in chunks)
+
+
+#  Test 2: no active booking → 403
+
+
+@pytest.mark.asyncio
+async def test_rag_requires_active_booking(client: AsyncClient):
+    """Sitter without a booking for the dog gets 403."""
+    # Register a sitter with no bookings
+    sitter_token = await _register_and_login(
+        client, "ragtest_sitter@test.com", "sitter"
+    )
+
+    response = await client.post(
+        "/rag/ask",
+        json={
+            "dog_id": "00000000-0000-0000-0000-000000000001",
+            "question": "How much food?",
+        },
+        headers={"Authorization": f"Bearer {sitter_token}"},
+    )
+
+    assert response.status_code == 403
+    assert "No active booking" in response.json()["detail"]
+
+
+#  Test 3: pending embedding status → 400
+
+
+@pytest.mark.asyncio
+async def test_rag_requires_completed_embeddings(client: AsyncClient):
+    """Returns 400 when care instructions exist but embeddings are pending."""
+    from uuid import uuid4
+    from sqlalchemy import insert
+    from app.core.database import get_db
+    from app.models.user import User
+    from app.models.dog import Dog
+    from app.models.booking import Booking
+    from app.models.care_instruction import CareInstruction
+    import uuid
+
+    # Register owner + sitter
+    owner_token = await _register_and_login(client, "ragtest_owner2@test.com", "owner")
+    sitter_token = await _register_and_login(
+        client, "ragtest_sitter2@test.com", "sitter"
+    )
+
+    # Get their IDs
+    owner_me = await client.get(
+        "/users/me", headers={"Authorization": f"Bearer {owner_token}"}
+    )
+    sitter_me = await client.get(
+        "/users/me", headers={"Authorization": f"Bearer {sitter_token}"}
+    )
+    owner_id = owner_me.json()["id"]
+    sitter_id = sitter_me.json()["id"]
+
+    # Create a dog
+    dog_resp = await client.post(
+        "/dogs/",
+        json={"name": "TestDog", "breed": "Lab", "age": 3, "weight": 50},
+        headers={"Authorization": f"Bearer {owner_token}"},
+    )
+    dog_id = dog_resp.json()["id"]
+
+    # Create + confirm a booking
+    booking_resp = await client.post(
+        "/bookings/",
+        json={
+            "sitter_id": sitter_id,
+            "dog_id": dog_id,
+            "start_date": "2026-08-01",
+            "end_date": "2026-08-03",
+        },
+        headers={"Authorization": f"Bearer {owner_token}"},
+    )
+    booking_id = booking_resp.json()["id"]
+
+    await client.patch(
+        f"/bookings/{booking_id}/status",
+        json={"status": "confirmed"},
+        headers={"Authorization": f"Bearer {sitter_token}"},
+    )
+
+    # Insert care instructions with pending status directly via API
+    # (mock embeddings so it stays pending)
+    with patch("app.services.care_instruction_service.index_care_instructions"):
+        await client.post(
+            f"/care-instructions/{dog_id}",
+            json={"content": "Feed him once a day."},
+            headers={"Authorization": f"Bearer {owner_token}"},
+        )
+
+    # Ask RAG — should get 400 (embeddings not ready)
+    response = await client.post(
+        "/rag/ask",
+        json={"dog_id": dog_id, "question": "How much food?"},
+        headers={"Authorization": f"Bearer {sitter_token}"},
+    )
+
+    assert response.status_code == 400
+    assert "still being processed" in response.json()["detail"]
+
+
+# Test 4: Happy path - fully mocked
+@pytest.mark.asyncio
+async def test_rag_returns_answer(client: AsyncClient):
+    """Happy path: correct booking + completed embeddings -> answer returned."""
+
+    # Register owner + sitter
+    owner_token = await _register_and_login(client, "ragtest_owner@test.com", "owner")
+    sitter_token = await _register_and_login(
+        client, "ragtest_sitter@test.com", "sitter"
+    )
+
+    owner_me = await client.get(
+        "/users/me", headers={"Authorization": f"Bearer {owner_token}"}
+    )
+    sitter_me = await client.get(
+        "/users/me", headers={"Authorization": f"Bearer {sitter_token}"}
+    )
+
+    owner_id = owner_me.json()["id"]
+    sitter_id = sitter_me.json()["id"]
+
+    # create dog + booking
+    dog_response = await client.post(
+        "/dogs/",
+        json={"name": "MockDog", "breed": "Poodle", "age": 2, "weight": 20},
+        headers={"Authorization": f"Bearer {owner_token}"},
+    )
+    dog_id = dog_response.json()["id"]
+
+    booking_response = await client.post(
+        "/bookings/",
+        json={
+            "sitter_id": sitter_id,
+            "dog_id": dog_id,
+            "start_date": "2026-09-01",
+            "end_date": "2026-09-03",
+        },
+        headers={"Authorization": f"Bearer {owner_token}"},
+    )
+    booking_id = booking_response.json()["id"]
+
+    await client.patch(
+        f"/bookings/{booking_id}/status",
+        json={"status": "completed"},
+        headers={"Authorization": f"Bearer {sitter_token}"},
+    )
+
+    # mock embedding pipeline so care instructions get status==completed
+    fake_embedding = [0.1] * 1536
+    mock_embed_response = MagicMock()
+    mock_embed_response.data = [MagicMock(embedding=fake_embedding)]
+
+    with patch("app.services.embedding_service.openai_client") as mock_openai:
+        mock_openai.embedding.create.return_value = mock_embed_response
+
+        await client.post(
+            f"/care-instructions/{dog_id}",
+            json={"content": "feed macdog once a day at 6pm"},
+            headers={"Authorization": f"Bearer {owner_token}"},
+        )
+
+    # Mock both OpenAI (for question embedding) and Anthropic (for answer)
+    mock_claude_response = MagicMock()
+    mock_claude_response.content = [MagicMock(text="Feed MockDog once a day at noon.")]
+
+    with (
+        patch("app.services.embedding_service.openai_client") as mock_openai,
+        patch("app.services.rag_service.anthropic_client") as mock_anthropic,
+    ):
+        mock_openai.embeddings.create.return_value = mock_embed_response
+        mock_anthropic.messages.create.return_value = mock_claude_response
+
+        response = await client.post(
+            "/rag/ask",
+            json={"dog_id": dog_id, "question": "When does MockDog eat?"},
+            headers={"Authorization": f"Bearer {sitter_token}"},
+        )
+
+    assert response.status_code == 200
+    assert "answer" in response.json()
+    assert len(response.json()["answer"]) > 0

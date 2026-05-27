@@ -1,13 +1,15 @@
 from openai import OpenAI
+import asyncio
+from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, text
 from app.core import config
 from app.models.care_instruction import CareInstruction
 from app.models.care_instruction_chunk import CareInstructionChunk
 import uuid
 from datetime import datetime, timezone
 
-client = OpenAI(api_key=config.OPENAI_API_KEY)
+openai_client = OpenAI(api_key=config.OPENAI_API_KEY)
 
 CHUNK_SIZE = 200  # target tokens (~150 words)
 CHUNK_OVERLAP = 20  # overlap tokens (~15 words)
@@ -69,7 +71,7 @@ def chunk_text(text: str) -> list[str]:
 
 def embed_chunks(chunks: list[str]) -> list[list[float]]:
     """Call OpenAI text-embedding-3-small. Returns one vector per chunk."""
-    response = client.embeddings.create(
+    response = openai_client.embeddings.create(
         model=EMBED_MODEL,
         input=chunks,
     )
@@ -116,3 +118,52 @@ async def index_care_instructions(db: AsyncSession, care_instruction_id: str) ->
     record.updated_at = datetime.now(timezone.utc)
 
     await db.commit()
+
+
+async def search_similar_chunks(
+    db: AsyncSession,
+    dog_id: UUID,
+    question: str,
+    top_k: int = 3,
+) -> list[str]:
+    """
+    Embed the sitter's question and return the top_k most similar
+    chunk contents from this dog's care instructions.
+    """
+    # 1. Embed the question — same model as indexing (mandatory)
+    question_embedding = await asyncio.to_thread(
+        lambda: (
+            openai_client.embeddings.create(
+                model="text-embedding-3-small",
+                input=question,
+            )
+            .data[0]
+            .embedding
+        )
+    )
+
+    # 2. Find this dog's care_instruction record
+    care_instruction_result = await db.execute(
+        select(CareInstruction).where(CareInstruction.dog_id == dog_id)
+    )
+    care_instruction = care_instruction_result.scalar_one_or_none()
+    if not care_instruction:
+        return []
+
+    # 3. Cosine similarity search scoped to this dog's chunks only
+    result = await db.execute(
+        text("""
+            SELECT content
+            FROM care_instruction_chunks
+            WHERE care_instruction_id = :care_instruction_id
+            ORDER BY embedding <=> CAST(:embedding AS vector)
+            LIMIT :top_k
+        """),
+        {
+            "care_instruction_id": str(care_instruction.id),
+            "embedding": str(question_embedding),
+            "top_k": top_k,
+        },
+    )
+
+    return [row.content for row in result.fetchall()]

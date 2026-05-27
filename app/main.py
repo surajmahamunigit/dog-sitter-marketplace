@@ -13,6 +13,7 @@ from app.routes import (
     payments,
     matches,
     care_instrctions,
+    rag,
 )
 
 app = FastAPI()
@@ -36,6 +37,7 @@ app.include_router(bookings.router)
 app.include_router(payments.router)
 app.include_router(matches.router)
 app.include_router(care_instrctions.router)
+app.include_router(rag.router)
 
 
 @app.get("/health")
