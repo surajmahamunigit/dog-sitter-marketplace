@@ -22,7 +22,6 @@ export default function Dashboard() {
         const [bookings, setBookings] = useState<Booking[]>([]);
         const [loading, setLoading] = useState(true);
         const [error, setError] = useState<string | null>(null);
-        
 
         const navigate = useNavigate()
         const [showPicker, setShowPicker] = useState(false)
@@ -30,14 +29,10 @@ export default function Dashboard() {
         const [matching, setMatching] = useState(false)
         const [matchError, setMatchError] = useState<string | null>(null)
 
-
         async function handleFindMatches() {
-
             if (!selectedDogId) return
-            
             setMatching(true)
             setMatchError(null)
-            
             try {
                 const results: MatchResponse = await findMatches(selectedDogId)
                 navigate('/matches/results', { state: { results } })
@@ -49,21 +44,20 @@ export default function Dashboard() {
             }
         }
 
-
         useEffect(() => {
             async function load() {
-            try {
-                const [dogsData, bookingsData] = await Promise.all([
-                getMyDogs(),
-                getMyBookings(),
-                ]);
-                setDogs(dogsData);
-                setBookings(bookingsData);
-            } catch {
-                setError("Failed to load dashboard.");
-            } finally {
-                setLoading(false);
-            }
+                try {
+                    const [dogsData, bookingsData] = await Promise.all([
+                        getMyDogs(),
+                        getMyBookings(),
+                    ]);
+                    setDogs(dogsData);
+                    setBookings(bookingsData);
+                } catch {
+                    setError("Failed to load dashboard.");
+                } finally {
+                    setLoading(false);
+                }
             }
             load();
         }, []);
@@ -72,128 +66,203 @@ export default function Dashboard() {
         if (error) return <p className="p-8 text-red-500">{error}</p>;
 
         return (
-            <div className="max-w-3xl mx-auto p-8 space-y-10">
+            <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
 
-                {/* Top bar */}
-                <div className="flex justify-between items-center">
-                <p className="text-gray-600">Welcome back, {user?.name}</p>
-                <Link to="/sitters" className="font-bold text-blue-600 hover:underline">
-                    Find a Sitter →
-                </Link>
+                {/* Welcome header */}
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h1 className="text-2xl font-bold text-stone-900">
+                            Welcome back, {user?.name}
+                        </h1>
+                        <p className="text-sm text-stone-400 mt-1">
+                            Manage your pets, bookings, and AI care profiles.
+                        </p>
+                    </div>
+                    <Link
+                        to="/sitters"
+                        className="text-sm text-amber-700 font-semibold hover:text-amber-600"
+                    >
+                        Browse Sitters →
+                    </Link>
                 </div>
 
-                {/* Hero */}
-                <div className="text-center space-y-4">
-                <h1 className="text-3xl font-bold">Smart Match: Find Your Perfect Sitter</h1>
-                <p className="text-gray-500 max-w-xl mx-auto">
-                    Our platform uses powerful AI to find highest-rated caregivers in your area,
-                    based on specific pet needs and AI chat support during caregiving.
-                </p>
-
-                {!showPicker ? (
-                    <button
-                        onClick={() => setShowPicker(true)}
-                        className="text-white px-5 py-2.5 rounded-lg font-semibold cursor-pointer"
-                        style={{ backgroundColor: '#499349' }}
-                    >
-                    Use AI to Find Sitters
-                    </button>
-                ) : (
-                    <div className="border border-purple-200 rounded-lg p-4 bg-purple-50 text-left max-w-md mx-auto">
-                    <h3 className="font-semibold mb-3">Which dog are you finding a sitter for?</h3>
-
-                    {dogs.map(dog => (
-                        <label key={dog.id} className="flex items-center gap-2 mb-2 cursor-pointer">
-                        <input
-                            type="radio"
-                            name="dogPicker"
-                            value={dog.id}
-                            checked={selectedDogId === dog.id}
-                            onChange={e => setSelectedDogId(e.target.value)}
-                        />
-                        {dog.name}
-                        </label>
-                    ))}
-
-                    {matchError && (
-                        <div className="text-sm mt-2">
-                        <p className="text-red-600">{matchError}</p>
-                        {matchError.includes('location') && (
-                            <a href="/owner/edit-profile" className="text-blue-600 hover:underline">
-                            Add your location →
-                            </a>
+                {/* AI Smart Match block */}
+                <div className="rounded-2xl p-6 flex flex-col gap-4" style={{ background: "linear-gradient(135deg, #b45309 0%, #d97706 60%, #f59e0b 100%)", boxShadow: "0 4px 16px rgba(180,83,9,0.25)" }}>
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <h2 className="text-base font-semibold text-white mb-1">
+                                AI Smart Match
+                            </h2>
+                            <p className="text-xs text-amber-100 leading-relaxed max-w-sm">
+                                Our AI finds highest-rated caregivers in your area based on your pet's needs, routines and care profile.
+                            </p>
+                            <ul className="mt-3 space-y-1">
+                                {["Matches based on your pet's needs", "Top-rated & verified sitters", "AI chat support during care"].map(item => (
+                                    <li key={item} className="flex items-center gap-2 text-xs text-amber-100">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-white inline-block flex-shrink-0"></span>
+                                        {item}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        {!showPicker && (
+                            <button
+                                onClick={() => setShowPicker(true)}
+                                className="flex-shrink-0 bg-white text-amber-700 text-sm font-semibold px-5 py-2.5 rounded-full cursor-pointer hover:bg-amber-50 transition-colors"
+                            >
+                                Find AI Match →
+                            </button>
                         )}
+                    </div>
+
+                    {showPicker && (
+                        <div className="bg-amber-800 bg-opacity-40 rounded-xl p-4">
+                            <h3 className="text-sm font-semibold text-white mb-3">
+                                Which dog are you finding a sitter for?
+                            </h3>
+                            {dogs.map(dog => (
+                                <label key={dog.id} className="flex items-center gap-2 mb-2 cursor-pointer text-amber-100 text-sm">
+                                    <input
+                                        type="radio"
+                                        name="dogPicker"
+                                        value={dog.id}
+                                        checked={selectedDogId === dog.id}
+                                        onChange={e => setSelectedDogId(e.target.value)}
+                                    />
+                                    {dog.name}
+                                </label>
+                            ))}
+                            {matchError && (
+                                <div className="text-sm mt-2">
+                                    <p className="text-red-200">{matchError}</p>
+                                    {matchError.includes('location') && (
+                                        <a href="/owner/edit-profile" className="text-white underline">
+                                            Add your location →
+                                        </a>
+                                    )}
+                                </div>
+                            )}
+                            <div className="flex gap-3 mt-4">
+                                <button
+                                    onClick={handleFindMatches}
+                                    disabled={!selectedDogId || matching}
+                                    className="bg-white text-amber-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-amber-50 disabled:opacity-50 cursor-pointer"
+                                >
+                                    {matching ? 'Claude is thinking...' : 'Find Matches'}
+                                </button>
+                                <button
+                                    onClick={() => { setShowPicker(false); setMatchError(null) }}
+                                    className="text-amber-100 hover:text-white text-sm cursor-pointer"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
                         </div>
                     )}
-
-                    <div className="flex gap-3 mt-4">
-                        <button
-                        onClick={handleFindMatches}
-                        disabled={!selectedDogId || matching}
-                        className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 disabled:opacity-50"
-                        >
-                        {matching ? 'Claude is thinking...' : 'Find Matches'}
-                        </button>
-                        <button
-                        onClick={() => { setShowPicker(false); setMatchError(null) }}
-                        className="text-gray-500 hover:text-gray-700"
-                        >
-                        Cancel
-                        </button>
-                    </div>
-                    </div>
-                )}
                 </div>
 
                 {/* Account management */}
-                <div className="text-center space-y-1">
-                <p className="text-sm font-semibold text-gray-600">Account Management</p>
-                <a href="/owner/edit-profile" className="text-sm text-blue-600 hover:underline block">
-                    Edit Profile
-                </a>
+                <div className="bg-white border border-stone-200 rounded-2xl px-5 py-4 shadow-sm flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-lg flex-shrink-0">
+                            👤
+                        </div>
+                        <div>
+                            <p className="text-sm font-semibold text-stone-900">Account Management</p>
+                            <p className="text-xs text-stone-400">Update your personal information and preferences.</p>
+                        </div>
+                    </div>
+                    <Link
+                        to="/owner/edit-profile"
+                        className="text-sm font-medium text-stone-600 hover:text-stone-900 border border-stone-200 px-4 py-1.5 rounded-full transition-colors"
+                    >
+                        Edit Profile →
+                    </Link>
                 </div>
-
-                <hr className="border-gray-200" />
 
                 {/* Dogs section */}
                 <section>
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold">My Dogs</h2>
-                    <Link to="/dogs/new" className="text-sm text-blue-600 hover:underline">
-                    + Add Dog
-                    </Link>
-                </div>
-                {dogs.length === 0 ? (
-                    <p className="text-gray-500">No dogs yet.</p>
-                ) : (
-                    <ul className="space-y-2">
-                    {dogs.map((dog) => (
-                        <li key={dog.id} className="border rounded p-3 flex justify-between items-center">
-                        <span>{dog.name} — {dog.breed}, {dog.age} yrs</span>
-                        <Link to={`/dogs/${dog.id}/edit-profile`} className="text-sm text-blue-600 hover:underline">
-                            Edit Profile
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-bold text-stone-900">My Dogs</h2>
+                        <Link
+                            to="/dogs/new"
+                            className="text-sm font-medium text-amber-700 border border-amber-200 px-4 py-1.5 rounded-full hover:bg-amber-50 transition-colors"
+                        >
+                            + Add Dog
                         </Link>
-                        </li>
-                    ))}
-                    </ul>
-                )}
+                    </div>
+                    {dogs.length === 0 ? (
+                        <p className="text-stone-400 text-sm">No dogs yet.</p>
+                    ) : (
+                        <div className="grid grid-cols-2 gap-4">
+                            {dogs.map((dog) => (
+                                <div key={dog.id} className="bg-white border border-stone-200 rounded-2xl px-5 py-4 shadow-sm">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-xl flex-shrink-0">
+                                            🐶
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-bold text-stone-900">{dog.name}</p>
+                                            <p className="text-xs text-stone-400">{dog.breed} · {dog.age} yrs</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Link
+                                            to={`/dogs/${dog.id}/edit-profile`}
+                                            className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-full text-xs font-medium transition-colors"
+                                        >
+                                            Edit Profile
+                                        </Link>
+                                        <Link
+                                            to={`/care-instructions/${dog.id}`}
+                                            className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-white rounded-full text-xs font-medium transition-colors"
+                                        >
+                                            Care Instructions
+                                        </Link>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </section>
 
                 {/* Bookings section */}
                 <section>
-                <h2 className="text-xl font-semibold mb-4">My Bookings</h2>
-                {bookings.length === 0 ? (
-                    <p className="text-gray-500">No bookings yet.</p>
-                ) : (
-                    <ul className="space-y-2">
-                    {bookings.map((booking) => (
-                        <li key={booking.id} className="border rounded p-3">
-                        <p>{booking.start_date} → {booking.end_date}</p>
-                        <p className="text-sm text-gray-500 capitalize">Status: {booking.status}</p>
-                        </li>
-                    ))}
-                    </ul>
-                )}
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-bold text-stone-900">My Bookings</h2>
+                    </div>
+                    {bookings.length === 0 ? (
+                        <p className="text-stone-400 text-sm">No bookings yet.</p>
+                    ) : (
+                        <ul className="space-y-3">
+                            {bookings.map((booking) => (
+                                <li key={booking.id} className="bg-white border border-stone-200 rounded-2xl px-5 py-4 shadow-sm">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-lg flex-shrink-0">
+                                            🐾
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-sm font-bold text-stone-900">{booking.dog_name}</p>
+                                            <p className="text-xs text-stone-400 flex items-center gap-1 mt-0.5">
+                                                📅{" "}
+                                                {new Date(booking.start_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                                                {" → "}
+                                                {new Date(booking.end_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                                            </p>
+                                        </div>
+                                        <span className={`text-xs font-medium px-3 py-1 rounded-full capitalize ${
+                                            booking.status === "confirmed" ? "bg-green-100 text-green-700" :
+                                            booking.status === "pending" ? "bg-amber-100 text-amber-700" :
+                                            booking.status === "completed" ? "bg-stone-100 text-stone-500" :
+                                            "bg-red-100 text-red-500"
+                                        }`}>
+                                            {booking.status}
+                                        </span>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </section>
 
             </div>
@@ -201,12 +270,13 @@ export default function Dashboard() {
     }
 
     function SitterDashboard() {
-        const [bookings, setBookings] = useState<Booking[]>([]);
-        const [loading, setLoading] = useState(true);
-        const [error, setError] = useState<string | null>(null);
+    const [bookings, setBookings] = useState<Booking[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
 
-        useEffect(() => {
-            async function load() {
+    useEffect(() => {
+        async function load() {
             try {
                 const data = await getMyBookings();
                 setBookings(data);
@@ -215,30 +285,30 @@ export default function Dashboard() {
             } finally {
                 setLoading(false);
             }
-            }
-            load();
-        }, []);
+        }
+        load();
+    }, []);
 
-        async function handleStatusChange(bookingId: string, newStatus: string) {
-            try {
+    async function handleStatusChange(bookingId: string, newStatus: string) {
+        try {
             const updated = await updateBookingStatus(bookingId, newStatus);
             setBookings(bookings.map((b) =>
                 b.id === updated.id ? updated : b
             ));
-            } catch {
+        } catch {
             alert("Failed to update booking status.");
-            }
         }
+    }
 
-        if (loading) return <p className="p-8">Loading...</p>;
-        if (error) return <p className="p-8 text-red-500">{error}</p>;
+    if (loading) return <p className="p-8">Loading...</p>;
+    if (error) return <p className="p-8 text-red-500">{error}</p>;
 
-        return (
-            <div className="max-w-3xl mx-auto p-8 space-y-6">
+    return (
+        <div className="max-w-3xl mx-auto p-8 space-y-6">
             <h1 className="text-3xl font-bold">Sitter Dashboard</h1>
             <Link
                 to="/sitter/edit-profile"
-                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700"
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-blue-700"
             >
                 Edit Profile
             </Link>
@@ -247,50 +317,95 @@ export default function Dashboard() {
                 <p className="text-gray-500">No bookings yet.</p>
             ) : (
                 <ul className="space-y-3">
-                {bookings.map((booking) => (
-                    <li key={booking.id} className="border rounded p-4 space-y-2">
-                    <p>{booking.start_date} → {booking.end_date}</p>
-                    <p className="text-sm text-gray-500 capitalize">
-                        Status: {booking.status}
-                    </p>
-                    <div className="flex gap-2">
-                        {booking.status === "pending" && (
-                        <>
-                            <button
-                            onClick={() => handleStatusChange(booking.id, "confirmed")}
-                            className="px-3 py-1 bg-green-600 text-white rounded text-sm"
-                            >
-                            Confirm
-                            </button>
-                            <button
-                            onClick={() => handleStatusChange(booking.id, "cancelled")}
-                            className="px-3 py-1 bg-red-500 text-white rounded text-sm"
-                            >
-                            Cancel
-                            </button>
-                        </>
-                        )}
-                        {booking.status === "confirmed" && (
-                        <>
-                            <button
-                            onClick={() => handleStatusChange(booking.id, "completed")}
-                            className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
-                            >
-                            Mark Complete
-                            </button>
-                            <button
-                            onClick={() => handleStatusChange(booking.id, "cancelled")}
-                            className="px-3 py-1 bg-red-500 text-white rounded text-sm"
-                            >
-                            Cancel
-                            </button>
-                        </>
-                        )}
-                    </div>
-                    </li>
-                ))}
+                    {bookings.map((booking) => (
+                        <li key={booking.id} className="border rounded-xl p-4 space-y-3 bg-white">
+                            <div className="flex items-center justify-between">
+                                <p className="text-base font-bold text-gray-1000">{booking.owner_name}</p>
+                                <p className="text-xs text-gray-800">
+                                    {new Date(booking.start_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                                    {" → "}
+                                    {new Date(booking.end_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
+                                </p>
+                            </div>
+                            <p className="text-xs text-gray-500 capitalize mt-1">Status: {booking.status}</p>
+
+                            {/* Action buttons */}
+                            <div className="flex gap-2 flex-wrap">
+                                {booking.status === "pending" && (
+                                    <>
+                                        <button
+                                            onClick={() => handleStatusChange(booking.id, "confirmed")}
+                                            className="px-3 py-1 bg-green-600 text-white rounded-full text-sm"
+                                        >
+                                            Confirm
+                                        </button>
+                                        <button
+                                            onClick={() => handleStatusChange(booking.id, "cancelled")}
+                                            className="px-3 py-1 bg-red-400 text-white rounded-full text-sm"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </>
+                                )}
+                                {booking.status === "confirmed" && (
+                                    <>
+                                        <button
+                                            onClick={() => handleStatusChange(booking.id, "completed")}
+                                            className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
+                                        >
+                                            Mark Complete
+                                        </button>
+                                        <button
+                                            onClick={() => handleStatusChange(booking.id, "cancelled")}
+                                            className="px-3 py-1 bg-red-400 text-white rounded text-sm"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+
+                            {/* AI care card — only for active bookings */}
+                            {(booking.status === "pending" || booking.status === "confirmed") && (
+                                <div
+                                    className="rounded-xl p-4 mt-2"
+                                    style={{ background: "linear-gradient(135deg, #04342C 0%, #0F6E56 60%, #1D9E75 100%)" }}
+                                >
+                                    {/* Header */}
+                                    <div className="flex items-center justify-between mb-1">
+                                        <p className="text-sm font-semibold text-emerald-50">
+                                            Ask AI about {booking.dog_name}
+                                        </p>
+                                        <span className="text-xs text-emerald-300 border border-emerald-700 bg-white/10 rounded-full px-2 py-0.5">
+                                            AI-powered
+                                        </span>
+                                    </div>
+
+                                    {/* Subtitle */}
+                                    <div className="flex items-center gap-1.5 mb-3">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+                                        <p className="text-xs text-emerald-400">Personalized guidance for {booking.dog_name}'s stay</p>
+                                    </div>
+
+                                    {/* Description */}
+                                    <p className="text-xs text-emerald-200 leading-relaxed mb-4">
+                                        Get instant insights about routines, feeding, behaviour, energy levels, and personalized care instructions.
+                                    </p>
+
+                                    {/* CTA */}
+                                    <button
+                                        onClick={() => navigate(`/chat/${booking.id}`)}
+                                        className="bg-emerald-50 text-emerald-900 text-sm font-medium rounded-full px-4 py-1.5 cursor-pointer hover:bg-white transition-colors"
+                                    >
+                                        Ask AI →
+                                    </button>
+                                </div>
+                            )}
+                        </li>
+                    ))}
                 </ul>
             )}
-            </div>
-        );
+        </div>
+    );
 }
+

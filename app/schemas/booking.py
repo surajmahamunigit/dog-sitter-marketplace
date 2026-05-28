@@ -53,6 +53,7 @@ class BookingResponse(BaseModel):
     owner_id: UUID
     sitter_id: UUID
     dog_id: UUID
+    owner_name: str
     dog_name: str
     status: str
     start_date: date

@@ -19,6 +19,8 @@ import EditDogProfile from "../pages/EditDogProfile"
 import EditSitterProfile from "../pages/EditSitterProfile"
 import MatchResults from '../pages/MatchResults'
 import EditOwnerProfile from '../pages/EditOwnerProfile'
+import RagChat from "../pages/RagChat"
+import CareInstructions from "../pages/CareInstructions"
 
 export default function AppRoutes() {
     return (
@@ -67,6 +69,10 @@ export default function AppRoutes() {
         <Route path="/matches/results" element={<ProtectedRoute><MatchResults /></ProtectedRoute>} />
         <Route path="/owner/edit-profile" element={
             <ProtectedRoute><EditOwnerProfile /></ProtectedRoute>
+        } />
+        <Route path="/chat/:bookingId" element={<ProtectedRoute><RagChat /></ProtectedRoute>} />
+        <Route path="/care-instructions/:dogId" element={
+            <ProtectedRoute><CareInstructions /></ProtectedRoute>
         } />
         </Routes>
         

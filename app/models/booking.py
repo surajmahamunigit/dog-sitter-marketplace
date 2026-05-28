@@ -25,6 +25,9 @@ class Booking(Base):
     dog_id: Mapped[str] = mapped_column(
         UUID(as_uuid=False), ForeignKey("dogs.id"), nullable=False
     )
+    owner: Mapped["User"] = relationship(
+        "User", foreign_keys="[Booking.owner_id]", lazy="selectin"
+    )
     status: Mapped[str] = mapped_column(nullable=False, default="pending")
     start_date: Mapped[date] = mapped_column(Date(), nullable=False)
     end_date: Mapped[date] = mapped_column(Date(), nullable=False)

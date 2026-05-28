@@ -48,17 +48,23 @@ async def ask_rag(
         return "I don't know — no care instructions found for this dog."
 
     # Assemble grounded prompt
+    # Assemble grounded prompt
     context = "\n\n".join(chunks)
-    prompt = f"""You are a helpful assistant for a dog sitter. 
-Answer the sitter's question using ONLY the care instructions provided below.
-If the answer is not in the instructions, say exactly: "I don't know — the owner didn't include that in their care instructions."
-Do not use any outside knowledge about dogs.
+    prompt = f"""You are a warm, friendly assistant helping a dog sitter care for a dog during their stay.
+
+The owner has written care instructions for their dog. Use ONLY these instructions to answer the sitter's question.
+Respond naturally and conversationally — like a knowledgeable friend, not a robot.
+Keep answers concise and practical. Use the dog's name when it feels natural.
+If the answer genuinely isn't in the instructions, say so warmly and briefly — don't repeat the question back or over-explain.
+Never make up information about the dog.
 
 CARE INSTRUCTIONS:
 {context}
 
 SITTER'S QUESTION:
-{question}"""
+{question}
+
+Answer naturally and helpfully:"""
 
     # Generate — call Claude
     import asyncio
@@ -66,8 +72,8 @@ SITTER'S QUESTION:
     response = await asyncio.to_thread(
         lambda: anthropic_client.messages.create(
             model="claude-sonnet-4-6",
-            max_tokens=1000,
-            temperature=0.1,
+            max_tokens=500,
+            temperature=0.4,
             messages=[{"role": "user", "content": prompt}],
         )
     )

@@ -2,62 +2,86 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Landing() {
-    // Check if user is already logged in
     const { isAuthenticated } = useAuth()
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-stone-50">
 
+            {/* Hero */}
+            <div className="max-w-2xl mx-auto text-center px-8 pt-20 pb-14">
 
-        {/* Hero section */}
-        <div className="max-w-3xl mx-auto text-center px-8 pt-24 pb-16">
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-full px-4 py-1.5 text-xs font-semibold text-amber-700 mb-8">
+                    ✦ AI-powered pet care
+                </div>
+
+                {/* Title */}
+                <h1 className="text-4xl font-bold text-stone-900 leading-tight mb-4" style={{ fontFamily: "'DM Serif Display', serif" }}>
+                    Pet Care<br />
+                    <span className="text-amber-600">Reimagined</span>
+                </h1>
+
+                {/* Subtext */}
+                <p className="text-base text-stone-500 leading-relaxed mb-8 max-w-lg mx-auto">
+                    Find trusted sitters, manage personalized care instructions, and provide AI-guided support for every stay.
+                </p>
+
+                {/* CTAs */}
+                <div className="flex gap-3 justify-center">
+                    <Link
+                        to="/register"
+                        className="text-white text-sm font-semibold px-6 py-2.5 rounded-full transition-colors"
+                        style={{ background: "linear-gradient(135deg, #b45309, #d97706)" }}
+                    >
+                        Find a Sitter →
+                    </Link>
+                    <Link
+                        to="/register?role=sitter"
+                        className="bg-orange-100 text-orange-700 border border-orange-300 text-sm font-medium px-6 py-2.5 rounded-full hover:bg-orange-200 transition-colors"
+                    >
+                        Become a Sitter
+                    </Link>
+                </div>
+            </div>
+
             
-            <h1 className="text-5xl font-bold text-gray-900 leading-tight mb-6 font-display">
-                Pet Care Reimagined
-            </h1>
-            <p className="text-xl text-gray-500 mb-10">
-            Experience a new era of pet ownership with PawSitter. Our AI-driven platform connects you with the perfect sitter, ensuring your furry friends are never alone.
-            </p>
-            <div className="flex gap-4 justify-center">
-            <Link
-                to="/register"
-                className="bg-blue-600 text-white px-8 py-3 rounded-xl text-base font-medium hover:bg-blue-700 transition-colors"
-            >
-                Find a sitter
-            </Link>
-            <Link
-                to="/register?role=sitter"
-                className="bg-gradient-to-r from-orange-400 to-pink-400 text-white px-8 py-3 rounded-xl text-base font-medium hover:from-orange-500 hover:to-pink-500 transition-colors"
-            >
-                Become a sitter
-            </Link>
-            </div>
-        </div>
 
-        {/* Three feature cards */}
-        <div className="max-w-4xl mx-auto px-8 grid grid-cols-3 gap-6 pb-24">
-            <div className="bg-gray-50 rounded-2xl p-6">
-                <div className="text-3xl mb-4">🐾</div>
-                <h3 className="font-semibold text-gray-900 mb-2 font-display">AI-matched sitters</h3>
-                <p className="text-sm text-gray-500">
-                Our matching engine pairs your dog's breed, energy, and needs with the right sitter.
-                </p>
+            {/* Feature cards */}
+            <div className="max-w-3xl mx-auto px-8 grid grid-cols-3 gap-5 pb-20">
+                {[
+                    {
+                        icon: "🐾",
+                        bg: "bg-amber-50",
+                        title: "AI-matched sitters",
+                        desc: "Our matching engine pairs your dog's breed, energy, and needs with the right sitter."
+                    },
+                    {
+                        icon: "💬",
+                        bg: "bg-emerald-50",
+                        title: "AI care assistant",
+                        desc: "Write care notes once. Your sitter gets instant AI-powered answers during the stay."
+                    },
+                    {
+                        icon: "💳",
+                        bg: "bg-blue-50",
+                        title: "Secure payments",
+                        desc: "Book and pay safely via Stripe. Automatic refunds if you need to cancel."
+                    },
+                ].map(card => (
+                    <div key={card.title} className="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm">
+                        <div className={`w-10 h-10 ${card.bg} rounded-xl flex items-center justify-center text-xl mb-4`}>
+                            {card.icon}
+                        </div>
+                        <h3 className="text-sm font-bold text-stone-900 mb-2">{card.title}</h3>
+                        <p className="text-xs text-stone-500 leading-relaxed">{card.desc}</p>
+                    </div>
+                ))}
             </div>
-            <div className="bg-gray-50 rounded-2xl p-6">
-                <div className="text-3xl mb-4">💬</div>
-                <h3 className="font-semibold text-gray-900 mb-2 font-display">AI care assistant</h3>
-                <p className="text-sm text-gray-500">
-                Write care notes once. Your sitter gets instant AI-powered answers during the stay.
-                </p>
+
+            {/* Footer */}
+            <div className="text-center pb-8 text-xs text-stone-400">
+                © 2026 PawSitter. All rights reserved.
             </div>
-            <div className="bg-gray-50 rounded-2xl p-6">
-                <div className="text-3xl mb-4">💳</div>
-                <h3 className="font-semibold text-gray-900 mb-2 font-display">Secure payments</h3>
-                <p className="text-sm text-gray-500">
-                    Book and pay safely via Stripe. Automatic refunds if you need to cancel.
-                </p>
-            </div>
-        </div>
 
         </div>
     )

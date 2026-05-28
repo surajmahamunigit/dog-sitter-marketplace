@@ -21,6 +21,7 @@ def _to_response(booking: Booking) -> BookingResponse:
         sitter_id=booking.sitter_id,
         dog_id=booking.dog_id,
         dog_name=booking.dog.name,
+        owner_name=booking.owner.name,
         status=booking.status,
         start_date=booking.start_date,
         end_date=booking.end_date,
