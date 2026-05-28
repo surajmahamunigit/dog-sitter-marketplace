@@ -58,7 +58,7 @@ async def create_booking(
     )
     db.add(booking)
     await db.commit()
-    await db.refresh(booking)
+    await db.refresh(booking, ["dog"])
 
     return booking
 

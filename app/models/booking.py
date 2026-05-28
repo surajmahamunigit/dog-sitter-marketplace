@@ -5,7 +5,7 @@ from datetime import date, datetime
 
 from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 
@@ -39,3 +39,5 @@ class Booking(Base):
     __table_args__ = (
         CheckConstraint("total_price > 0", name="bookings_total_price_positive"),
     )
+
+    dog: Mapped["Dog"] = relationship("Dog", lazy="selectin")

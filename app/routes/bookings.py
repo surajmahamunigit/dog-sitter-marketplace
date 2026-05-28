@@ -10,6 +10,25 @@ from app.core.dependencies import require_auth, require_owner, require_sitter
 from app.core.jwt import TokenData
 from app.schemas.booking import BookingCreate, BookingResponse, BookingStatusUpdate
 from app.services import booking_service
+from app.models.booking import Booking
+
+
+def _to_response(booking: Booking) -> BookingResponse:
+    """Map a Booking ORM object → BookingResponse, stitching in dog_name from the relationship."""
+    return BookingResponse(
+        id=booking.id,
+        owner_id=booking.owner_id,
+        sitter_id=booking.sitter_id,
+        dog_id=booking.dog_id,
+        dog_name=booking.dog.name,
+        status=booking.status,
+        start_date=booking.start_date,
+        end_date=booking.end_date,
+        total_price=booking.total_price,
+        created_at=booking.created_at,
+        updated_at=booking.updated_at,
+    )
+
 
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
 
@@ -27,7 +46,7 @@ async def create_booking(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-    return BookingResponse.model_validate(booking)
+    return _to_response(booking)
 
 
 @router.get("/", response_model=list[BookingResponse])
@@ -38,7 +57,7 @@ async def list_bookings(
 
     bookings = await booking_service.get_bookings_for_user(db, token_data.user_id)
 
-    return [BookingResponse.model_validate(b) for b in bookings]
+    return [_to_response(b) for b in bookings]
 
 
 @router.patch("/{booking_id}/status", response_model=BookingResponse)
@@ -62,4 +81,5 @@ async def update_booking_status(
         booking = await booking_service.update_booking_status(db, booking, body)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    return BookingResponse.model_validate(booking)
+
+    return _to_response(booking)
