@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.booking import Booking
 from app.models.dog import Dog
+from app.models.user import User
 from app.schemas.booking import BookingCreate, BookingStatusUpdate
 from app.services import payment_service
 
@@ -43,9 +44,21 @@ async def create_booking(
         raise ValueError("You cannot book yourself as a sitter")
 
     # Rule 3 : calculate price($150/night flat rate)
-    nights = (data.end_date - data.start_date).days
+    # Rule 3: calculate price from sitter's nightly rate
+    sitter_result = await db.execute(select(User).where(User.id == str(data.sitter_id)))
+    sitter = sitter_result.scalar_one_or_none()
 
-    total_price = nights * 15000
+    if sitter is None:
+        raise ValueError("Sitter not found.")
+
+    nightly_rate = (
+        sitter.sitter_profile.get("nightly_rate", 15000)
+        if sitter.sitter_profile
+        else 15000
+    )
+
+    nights = (data.end_date - data.start_date).days
+    total_price = nights * nightly_rate
 
     booking = Booking(
         owner_id=str(owner_id),

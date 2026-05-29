@@ -54,6 +54,8 @@ export interface Sitter {
     ai_summary: string | null
     profile_photo_url: string | null
     distance_miles?: number
+    average_rating: number | null
+    review_count: number
 }
 
 export interface Dog {
@@ -84,11 +86,12 @@ export interface Booking {
     sitter_id: string
     dog_id: string
     dog_name: string
-    owner_name: string 
+    owner_name: string
     status: string
     start_date: string
     end_date: string
     total_price: number
+    has_review: boolean
 }
 
 export interface SitterMatch {

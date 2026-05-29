@@ -25,6 +25,8 @@ class SitterResponse(BaseModel):
     location: dict | None = None
     sitter_profile: dict | None = None
     ai_summary: str | None = None
+    average_rating: float | None = None
+    review_count: int = 0
 
 
 class SitterListResponse(BaseModel):
@@ -44,3 +46,5 @@ class SitterListResponse(BaseModel):
     sitter_profile: dict | None = None
     ai_summary: str | None = None
     distance_miles: float | None = None
+    average_rating: float | None = None
+    review_count: int = 0

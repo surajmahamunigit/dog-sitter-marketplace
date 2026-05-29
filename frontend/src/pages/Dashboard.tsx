@@ -250,14 +250,27 @@ export default function Dashboard() {
                                                 {new Date(booking.end_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}
                                             </p>
                                         </div>
-                                        <span className={`text-xs font-medium px-3 py-1 rounded-full capitalize ${
-                                            booking.status === "confirmed" ? "bg-green-100 text-green-700" :
-                                            booking.status === "pending" ? "bg-amber-100 text-amber-700" :
-                                            booking.status === "completed" ? "bg-stone-100 text-stone-500" :
-                                            "bg-red-100 text-red-500"
-                                        }`}>
-                                            {booking.status}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className={`text-xs font-medium px-3 py-1 rounded-full capitalize ${
+                                                booking.status === "confirmed" ? "bg-green-100 text-green-700" :
+                                                booking.status === "pending" ? "bg-amber-100 text-amber-700" :
+                                                booking.status === "completed" ? "bg-stone-100 text-stone-500" :
+                                                "bg-red-100 text-red-500"
+                                            }`}>
+                                                {booking.status}
+                                            </span>
+                                            {booking.status === "completed" && !booking.has_review && (
+                                                <button
+                                                    onClick={() => navigate(`/review/${booking.id}`)}
+                                                    className="text-xs font-medium px-3 py-1 rounded-full bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
+                                                >
+                                                    Leave a Review
+                                                </button>
+                                            )}
+                                            {booking.status === "completed" && booking.has_review && (
+                                                <span className="text-xs text-stone-400">Reviewed</span>
+                                            )}
+                                        </div>
                                     </div>
                                 </li>
                             ))}

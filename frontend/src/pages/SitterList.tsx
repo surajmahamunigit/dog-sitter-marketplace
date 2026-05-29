@@ -108,19 +108,32 @@ export default function SitterList() {
                         <div
                             key={sitter.id}
                             onClick={() => navigate(`/sitters/${sitter.id}`)}
-                            className="border rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow"
+                            className="bg-white border border-stone-200 rounded-2xl p-4 cursor-pointer hover:shadow-md transition-shadow"
                         >
-                            <h2 className="text-xl font-semibold">{sitter.name}</h2>
-                            <p className="text-gray-500 text-sm">{sitter.location?.city}</p>
-                            {sitter.distance_miles !== null && (
-                                <p className="text-indigo-600 text-sm mt-1">
+                            <div className="flex items-center justify-between mb-1">
+                                <h2 className="text-base font-semibold text-stone-800">{sitter.name}</h2>
+                                {sitter.average_rating != null && (
+                                    <div className="flex items-center gap-1">
+                                        <span className="text-amber-400 text-sm">★</span>
+                                        <span className="text-sm font-medium text-stone-700">
+                                            {sitter.average_rating.toFixed(1)}
+                                        </span>
+                                        <span className="text-xs text-stone-400">
+                                            ({sitter.review_count})
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                            <p className="text-stone-400 text-xs">{sitter.location?.city}</p>
+                            {sitter.distance_miles != null && (
+                                <p className="text-amber-700 text-xs mt-1">
                                     {sitter.distance_miles.toFixed(1)} miles away
                                 </p>
                             )}
-                            <p className="text-gray-600 mt-1 text-sm line-clamp-2">{sitter.bio}</p>
-                            {sitter.sitter_profile?.rate_per_night && (
-                                <p className="mt-2 text-indigo-600 font-medium">
-                                    ${sitter.sitter_profile.rate_per_night}/night
+                            <p className="text-stone-500 text-sm mt-2 line-clamp-2">{sitter.bio}</p>
+                            {sitter.sitter_profile?.nightly_rate && (
+                                <p className="mt-2 text-amber-700 text-sm font-medium">
+                                    ${(sitter.sitter_profile.nightly_rate / 100).toFixed(0)} / night
                                 </p>
                             )}
                         </div>
