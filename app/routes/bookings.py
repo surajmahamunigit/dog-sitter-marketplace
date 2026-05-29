@@ -3,6 +3,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -10,11 +11,15 @@ from app.core.dependencies import require_auth, require_owner, require_sitter
 from app.core.jwt import TokenData
 from app.schemas.booking import BookingCreate, BookingResponse, BookingStatusUpdate
 from app.services import booking_service
+from app.models.review import Review
 from app.models.booking import Booking
 
 
-def _to_response(booking: Booking) -> BookingResponse:
-    """Map a Booking ORM object → BookingResponse, stitching in dog_name from the relationship."""
+async def _to_response(booking: Booking, db: AsyncSession) -> BookingResponse:
+    """Map a Booking ORM object → BookingResponse, stitching in related fields."""
+    result = await db.execute(select(Review).where(Review.booking_id == booking.id))
+    has_review = result.scalar_one_or_none() is not None
+
     return BookingResponse(
         id=booking.id,
         owner_id=booking.owner_id,
@@ -28,6 +33,7 @@ def _to_response(booking: Booking) -> BookingResponse:
         total_price=booking.total_price,
         created_at=booking.created_at,
         updated_at=booking.updated_at,
+        has_review=has_review,
     )
 
 
@@ -41,13 +47,12 @@ async def create_booking(
     db: AsyncSession = Depends(get_db),
 ) -> BookingResponse:
     """Create a booking - owner only."""
-
     try:
         booking = await booking_service.create_booking(db, token_data.user_id, body)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-    return _to_response(booking)
+    return await _to_response(booking, db)
 
 
 @router.get("/", response_model=list[BookingResponse])
@@ -55,10 +60,9 @@ async def list_bookings(
     token_data: TokenData = Depends(require_auth), db: AsyncSession = Depends(get_db)
 ) -> list[BookingResponse]:
     """List all the bookings for the authenticated user (owner or sitter)."""
-
     bookings = await booking_service.get_bookings_for_user(db, token_data.user_id)
 
-    return [_to_response(b) for b in bookings]
+    return [await _to_response(b, db) for b in bookings]
 
 
 @router.patch("/{booking_id}/status", response_model=BookingResponse)
@@ -83,4 +87,4 @@ async def update_booking_status(
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-    return _to_response(booking)
+    return await _to_response(booking, db)

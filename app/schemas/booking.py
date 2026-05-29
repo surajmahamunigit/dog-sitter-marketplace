@@ -61,3 +61,4 @@ class BookingResponse(BaseModel):
     total_price: int
     created_at: datetime
     updated_at: datetime
+    has_review: bool = False
