@@ -21,6 +21,7 @@ import MatchResults from '../pages/MatchResults'
 import EditOwnerProfile from '../pages/EditOwnerProfile'
 import RagChat from "../pages/RagChat"
 import CareInstructions from "../pages/CareInstructions"
+import ReviewForm from "../pages/ReviewForm";
 
 export default function AppRoutes() {
     return (
@@ -74,6 +75,8 @@ export default function AppRoutes() {
         <Route path="/care-instructions/:dogId" element={
             <ProtectedRoute><CareInstructions /></ProtectedRoute>
         } />
+        <Route path="/review/:bookingId" element={<ProtectedRoute><ReviewForm /></ProtectedRoute>} />
+        
         </Routes>
         
         
