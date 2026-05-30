@@ -22,10 +22,14 @@ async def update_user(db: AsyncSession, user: User, data: dict) -> User:
     """
     Apply partial update to the users record.
     Only fields present in data will be updated.
+    JSONB fields (location, sitter_profile) are merged, not replaced.
     """
-
     for field, value in data.items():
-        setattr(user, field, value)
+        if field in ("location", "sitter_profile") and value is not None:
+            existing = getattr(user, field) or {}
+            setattr(user, field, {**existing, **value})
+        else:
+            setattr(user, field, value)
 
     await db.commit()
     await db.refresh(user)

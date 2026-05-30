@@ -20,6 +20,9 @@ export default function EditSitterProfile() {
     // Form state
     const [bio, setBio] = useState("")
     const [city, setCity] = useState("")
+    const [lat, setLat] = useState<number | null>(null)
+    const [lng, setLng] = useState<number | null>(null)
+    const [locating, setLocating] = useState(false)
     const [experienceYears, setExperienceYears] = useState("0")
     const [nightlyRate, setNightlyRate] = useState("0")
     const [services, setServices] = useState<string[]>([])
@@ -44,6 +47,8 @@ export default function EditSitterProfile() {
 
             if (u.bio) setBio(u.bio)
             if (u.location?.city) setCity(u.location.city)
+                if (u.location?.lat) setLat(u.location.lat)
+            if (u.location?.lng) setLng(u.location.lng)
 
             if (u.sitter_profile) {
             const p = u.sitter_profile
@@ -73,12 +78,28 @@ export default function EditSitterProfile() {
         : [...arr, value]
     }
 
+    function handleUseMyLocation() {
+        if (!navigator.geolocation) return
+        setLocating(true)
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setLat(position.coords.latitude)
+                setLng(position.coords.longitude)
+                setLocating(false)
+            },
+            () => {
+                setError("Could not get your location.")
+                setLocating(false)
+            }
+        )
+    }
+
     async function handleSubmit() {
         setSubmitting(true)
         try {
         const updated = await updateMe({
             bio,
-            location: { city },
+            location: { city, ...(lat !== null && lng !== null ? { lat, lng } : {}) },
             sitter_profile: {
             services,
             nightly_rate: Math.round(parseFloat(nightlyRate) * 100), // dollars → cents
@@ -120,11 +141,24 @@ export default function EditSitterProfile() {
             />
             <input
                 type="text"
-                className="w-full border rounded p-2"
+                className="w-full border rounded p-2 mb-2"
                 placeholder="City (e.g. Los Angeles)"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
             />
+            <button
+                type="button"
+                onClick={handleUseMyLocation}
+                disabled={locating}
+                className="text-sm text-amber-700 border border-amber-300 px-3 py-1.5 rounded-full hover:bg-amber-50 disabled:opacity-50 cursor-pointer"
+            >
+                {locating ? "Locating..." : "Use My Location"}
+            </button>
+            {lat && lng && (
+                <p className="text-xs text-stone-400 mt-1">
+                    Location set: {lat.toFixed(4)}, {lng.toFixed(4)}
+                </p>
+            )}
         </section>
 
         {/* Services */}
