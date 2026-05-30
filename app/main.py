@@ -6,13 +6,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import (
     auth,
+    care_instructions,
     users,
     dogs,
     sitters,
     bookings,
     payments,
     matches,
-    care_instrctions,
     rag,
     reviews,
 )
@@ -37,7 +37,7 @@ app.include_router(sitters.router)
 app.include_router(bookings.router)
 app.include_router(payments.router)
 app.include_router(matches.router)
-app.include_router(care_instrctions.router)
+app.include_router(care_instructions.router)
 app.include_router(rag.router)
 app.include_router(reviews.router)
 
