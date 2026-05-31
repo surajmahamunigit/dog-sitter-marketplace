@@ -86,11 +86,15 @@ async def run_async_migrations() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
+    import os
+    from sqlalchemy import create_engine
 
-    asyncio.run(run_async_migrations())
-
-
-if context.is_offline_mode():
-    run_migrations_offline()
-else:
-    run_migrations_online()
+    sync_url = os.getenv("SYNC_DATABASE_URL")
+    if sync_url:
+        sync_engine = create_engine(sync_url, poolclass=pool.NullPool)
+        with sync_engine.connect() as connection:
+            context.configure(connection=connection, target_metadata=target_metadata)
+            with context.begin_transaction():
+                context.run_migrations()
+    else:
+        asyncio.run(run_async_migrations())

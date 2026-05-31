@@ -12,6 +12,7 @@ dependencies = [
     "openai>=2.38.0",
     "passlib[bcrypt]>=1.7.4",
     "pgvector>=0.4.2",
+    "psycopg2-binary>=2.9.12",
     "pydantic[email]>=2.13.4",
     "python-dotenv>=1.2.2",
     "python-jose>=3.5.0",
