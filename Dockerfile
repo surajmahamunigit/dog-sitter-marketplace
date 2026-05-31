@@ -11,6 +11,7 @@ RUN uv sync --frozen --no-dev
 COPY app/ ./app/
 COPY migrations/ ./migrations/
 COPY alembic.ini ./
+COPY migrate.sh ./
 
 EXPOSE 8000
 
