@@ -36,3 +36,8 @@ export async function updateBookingStatus(
     );
     return response.data;
 }
+
+
+export const deleteBooking = async (bookingId: string): Promise<void> => {
+    await apiClient.delete(`/bookings/${bookingId}`);
+};

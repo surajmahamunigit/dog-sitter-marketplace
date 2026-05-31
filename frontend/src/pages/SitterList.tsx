@@ -125,31 +125,34 @@ export default function SitterList() {
           ) : sitters.length === 0 ? (
             <p className="text-stone-400 text-sm">No sitters found near you.</p>
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 auto-rows-fr">
               {sitters.map((sitter) => (
                 <div
                   key={sitter.id}
                   onClick={() => navigate(`/sitters/${sitter.id}`)}
-                  className="bg-stone-50 border border-stone-200 rounded-2xl p-4 cursor-pointer hover:shadow-md transition-shadow"
+                  className="bg-white rounded-2xl p-4 cursor-pointer hover:shadow-md transition-shadow border border-gray-200 border-l-4 border-l-amber-300 flex flex-col"
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <h2 className="text-base font-semibold text-stone-800">
+                    <h2 className="text-base font-semibold text-stone-900">
                       {sitter.name}
                     </h2>
                     <div className="flex items-center gap-1">
                       <span className="text-amber-400 text-sm">★</span>
-                      <span className="text-sm font-medium text-stone-700">
+                      <span className="text-sm font-medium text-stone-900">
                         {sitter.average_rating != null
                           ? sitter.average_rating.toFixed(1)
                           : "0"}
                       </span>
-                      <span className="text-xs text-stone-400">
+                      <span className="text-xs text-stone-700">
                         ({sitter.review_count})
                       </span>
                     </div>
                   </div>
-                  <p className="text-stone-400 text-xs">
-                    {sitter.location?.city || "Location not set"}
+                  <p className="text-stone-900 text-xs">
+                    {sitter.location?.city ||
+                      (sitter.distance_miles != null
+                        ? "Nearby"
+                        : "Location not set")}
                   </p>
                   {sitter.distance_miles != null && (
                     <p className="text-amber-700 text-xs mt-1">
@@ -157,12 +160,12 @@ export default function SitterList() {
                     </p>
                   )}
                   {sitter.bio && (
-                    <p className="text-stone-500 text-sm mt-2 line-clamp-2">
+                    <p className="text-stone-900 text-sm mt-2 line-clamp-2">
                       {sitter.bio}
                     </p>
                   )}
                   {sitter.sitter_profile?.nightly_rate ? (
-                    <p className="mt-2 text-amber-700 text-sm font-medium">
+                    <p className="mt-2 text-amber-800 text-sm font-medium">
                       ${(sitter.sitter_profile.nightly_rate / 100).toFixed(0)} /
                       night
                     </p>

@@ -88,3 +88,23 @@ async def update_booking_status(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     return await _to_response(booking, db)
+
+
+@router.delete("/{booking_id}", status_code=204)
+async def delete_booking(
+    booking_id: UUID,
+    token_data: TokenData = Depends(require_owner),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete a booking in awaiting_payment status. Owner only."""
+    booking = await booking_service.get_booking_by_id(db, booking_id)
+    if booking is None:
+        raise HTTPException(status_code=404, detail="Booking not found")
+    if str(booking.owner_id) != str(token_data.user_id):
+        raise HTTPException(status_code=403, detail="Not your booking")
+    if booking.status != "awaiting_payment":
+        raise HTTPException(
+            status_code=400, detail="Only unpaid bookings can be deleted"
+        )
+    await db.delete(booking)
+    await db.commit()

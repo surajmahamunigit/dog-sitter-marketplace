@@ -5,7 +5,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { getMyDogs } from "../api/dogs";
-import { getMyBookings, updateBookingStatus } from "../api/bookings";
+import {
+  getMyBookings,
+  updateBookingStatus,
+  deleteBooking,
+} from "../api/bookings";
 import type { Dog, Booking } from "../types";
 
 export default function Dashboard() {
@@ -42,6 +46,15 @@ function OwnerDashboard() {
       setMatchError(msg);
     } finally {
       setMatching(false);
+    }
+  }
+
+  async function handleDeleteBooking(bookingId: string) {
+    try {
+      await deleteBooking(bookingId);
+      setBookings(bookings.filter((b) => b.id !== bookingId));
+    } catch {
+      alert("Failed to delete booking.");
     }
   }
 
@@ -270,15 +283,20 @@ function OwnerDashboard() {
         )}
       </section>
 
-      {/* Bookings section */}
+      {/* Active Bookings */}
       <section>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold text-stone-900">My Bookings</h2>
-        </div>
-        {bookings.length === 0 ? (
+        <h2 className="text-lg font-bold text-stone-900 mb-4">
+          Active Bookings
+        </h2>
+        {bookings.filter(
+          (b) =>
+            b.status === "awaiting_payment" ||
+            b.status === "pending" ||
+            b.status === "confirmed",
+        ).length === 0 ? (
           <div className="bg-white border border-stone-200 rounded-2xl p-6 text-center shadow-sm">
-            <div className="text-3xl mb-2">📅</div>
-            <p className="text-stone-400 text-sm">No bookings yet.</p>
+            <div className="text-3xl mb-2">📋</div>
+            <p className="text-stone-400 text-sm">No active bookings yet.</p>
             <Link
               to="/sitters"
               className="text-amber-600 text-sm hover:underline mt-1 inline-block"
@@ -288,79 +306,164 @@ function OwnerDashboard() {
           </div>
         ) : (
           <ul className="space-y-3">
-            {bookings.map((booking) => (
-              <li
-                key={booking.id}
-                className="bg-white border border-stone-200 rounded-2xl px-5 py-4 shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-lg flex-shrink-0">
-                    🐾
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-bold text-stone-900">
-                      {booking.dog_name}
-                    </p>
-                    <p className="text-xs text-stone-400 flex items-center gap-1 mt-0.5">
-                      📅{" "}
-                      {new Date(booking.start_date).toLocaleDateString(
-                        "en-GB",
-                        { day: "numeric", month: "long", year: "numeric" },
-                      )}
-                      {" → "}
-                      {new Date(booking.end_date).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-xs font-medium px-3 py-1 rounded-full capitalize ${
-                        booking.status === "confirmed"
-                          ? "bg-green-100 text-green-700"
-                          : booking.status === "pending"
-                            ? "bg-amber-100 text-amber-700"
-                            : booking.status === "awaiting_payment"
-                              ? "bg-orange-100 text-orange-700"
-                              : booking.status === "completed"
-                                ? "bg-stone-100 text-stone-500"
-                                : "bg-red-100 text-red-500"
-                      }`}
-                    >
-                      {booking.status === "awaiting_payment"
-                        ? "Awaiting Payment"
-                        : booking.status}
-                    </span>
-                    {booking.status === "awaiting_payment" && (
-                      <button
-                        onClick={() => navigate(`/book/${booking.sitter_id}`)}
-                        className="text-xs font-medium px-3 py-1 rounded-full bg-amber-500 hover:bg-amber-600 text-white cursor-pointer"
+            {bookings
+              .filter(
+                (b) =>
+                  b.status === "awaiting_payment" ||
+                  b.status === "pending" ||
+                  b.status === "confirmed",
+              )
+              .sort(
+                (a, b) =>
+                  new Date(b.start_date).getTime() -
+                  new Date(a.start_date).getTime(),
+              )
+              .map((booking) => (
+                <li
+                  key={booking.id}
+                  className="bg-white border border-stone-200 rounded-2xl px-5 py-4 shadow-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-lg flex-shrink-0">
+                      🐾
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-stone-900">
+                        {booking.dog_name}
+                      </p>
+                      <p className="text-xs text-stone-400 flex items-center gap-1 mt-0.5">
+                        📅{" "}
+                        {new Date(booking.start_date).toLocaleDateString(
+                          "en-GB",
+                          { day: "numeric", month: "long", year: "numeric" },
+                        )}
+                        {" → "}
+                        {new Date(booking.end_date).toLocaleDateString(
+                          "en-GB",
+                          { day: "numeric", month: "long", year: "numeric" },
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs font-medium px-3 py-1 rounded-full capitalize ${
+                          booking.status === "confirmed"
+                            ? "bg-green-100 text-green-700"
+                            : booking.status === "pending"
+                              ? "bg-amber-100 text-amber-700"
+                              : booking.status === "awaiting_payment"
+                                ? "bg-orange-100 text-orange-700"
+                                : "bg-stone-100 text-stone-500"
+                        }`}
                       >
-                        Complete Payment
-                      </button>
-                    )}
-                    {booking.status === "cancelled" && (
-                      <span className="text-xs font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-600">
-                        Refunded
+                        {booking.status === "awaiting_payment"
+                          ? "Awaiting Payment"
+                          : booking.status}
                       </span>
-                    )}
-                    {booking.status === "completed" && !booking.has_review && (
-                      <button
-                        onClick={() => navigate(`/review/${booking.id}`)}
-                        className="text-xs font-medium px-3 py-1 rounded-full bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
-                      >
-                        Leave a Review
-                      </button>
-                    )}
-                    {booking.status === "completed" && booking.has_review && (
-                      <span className="text-xs text-stone-400">Reviewed</span>
-                    )}
+                      {booking.status === "awaiting_payment" && (
+                        <>
+                          <button
+                            onClick={() =>
+                              navigate(`/book/${booking.sitter_id}`)
+                            }
+                            className="text-xs font-medium px-3 py-1 rounded-full bg-amber-500 hover:bg-amber-600 text-white cursor-pointer"
+                          >
+                            Complete Payment
+                          </button>
+                          <button
+                            onClick={() => handleDeleteBooking(booking.id)}
+                            className="text-xs font-medium px-3 py-1 rounded-full bg-red-100 hover:bg-red-200 text-red-600 cursor-pointer"
+                          >
+                            Delete
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </li>
-            ))}
+                </li>
+              ))}
+          </ul>
+        )}
+      </section>
+
+      {/* Past Bookings */}
+      <section className="mt-8">
+        <h2 className="text-lg font-bold text-stone-900 mb-4">Past Bookings</h2>
+        {bookings.filter(
+          (b) => b.status === "completed" || b.status === "cancelled",
+        ).length === 0 ? (
+          <div className="bg-white border border-stone-200 rounded-2xl p-6 text-center shadow-sm">
+            <div className="text-3xl mb-2">📅</div>
+            <p className="text-stone-400 text-sm">No past bookings yet.</p>
+          </div>
+        ) : (
+          <ul className="space-y-3">
+            {bookings
+              .filter(
+                (b) => b.status === "completed" || b.status === "cancelled",
+              )
+              .sort(
+                (a, b) =>
+                  new Date(b.start_date).getTime() -
+                  new Date(a.start_date).getTime(),
+              )
+              .map((booking) => (
+                <li
+                  key={booking.id}
+                  className="bg-white border border-stone-200 rounded-2xl px-5 py-4 shadow-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-lg flex-shrink-0">
+                      🐾
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-stone-900">
+                        {booking.dog_name}
+                      </p>
+                      <p className="text-xs text-stone-400 flex items-center gap-1 mt-0.5">
+                        📅{" "}
+                        {new Date(booking.start_date).toLocaleDateString(
+                          "en-GB",
+                          { day: "numeric", month: "long", year: "numeric" },
+                        )}
+                        {" → "}
+                        {new Date(booking.end_date).toLocaleDateString(
+                          "en-GB",
+                          { day: "numeric", month: "long", year: "numeric" },
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs font-medium px-3 py-1 rounded-full capitalize ${
+                          booking.status === "completed"
+                            ? "bg-stone-100 text-stone-500"
+                            : "bg-red-100 text-red-500"
+                        }`}
+                      >
+                        {booking.status}
+                      </span>
+                      {booking.status === "cancelled" && (
+                        <span className="text-xs font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-600">
+                          Refunded
+                        </span>
+                      )}
+                      {booking.status === "completed" &&
+                        !booking.has_review && (
+                          <button
+                            onClick={() => navigate(`/review/${booking.id}`)}
+                            className="text-xs font-medium px-3 py-1 rounded-full bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
+                          >
+                            Leave a Review
+                          </button>
+                        )}
+                      {booking.status === "completed" && booking.has_review && (
+                        <span className="text-xs text-stone-400">Reviewed</span>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              ))}
           </ul>
         )}
       </section>

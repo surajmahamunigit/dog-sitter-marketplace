@@ -20,8 +20,8 @@ async def create_checkout_session(booking_id: UUID, db: AsyncSession) -> str:
 
     if booking is None:
         raise ValueError("Booking not found")
-    if booking.status != "pending":
-        raise ValueError("Booking is not in pending state")
+    if booking.status != "awaiting_payment":
+        raise ValueError("Booking is not in awaiting payment state")
 
     # Ask the Stripe to create the checkout session
     session = stripe.checkout.Session.create(
