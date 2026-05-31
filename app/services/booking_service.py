@@ -17,6 +17,7 @@ from app.services import payment_service
 
 # Valid status transition
 VALID_TRANSITIONS = {
+    "awaiting_payment": {"pending", "cancelled"},
     "pending": {"confirmed", "cancelled"},
     "confirmed": {"completed", "cancelled"},
     "completed": set(),
@@ -67,7 +68,7 @@ async def create_booking(
         start_date=data.start_date,
         end_date=data.end_date,
         total_price=total_price,
-        status="pending",
+        status="awaiting_payment",
     )
     db.add(booking)
     await db.commit()

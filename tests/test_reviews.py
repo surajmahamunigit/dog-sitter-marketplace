@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from httpx import AsyncClient
+from tests.conftest import set_booking_status
 
 
 async def _register_and_login(client: AsyncClient, email: str, role: str) -> str:
@@ -55,6 +56,9 @@ async def _create_completed_booking(
         headers=owner_headers,
     )
     booking_id = booking_resp.json()["id"]
+
+    # Simulate Stripe webhook — advance awaiting_payment → pending
+    await set_booking_status(booking_id, "pending")
 
     # Advance to completed using the real sitter token
     await client.patch(

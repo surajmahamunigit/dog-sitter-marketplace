@@ -101,8 +101,8 @@ function OwnerDashboard() {
               AI Smart Match
             </h2>
             <p className="text-xs text-amber-100 leading-relaxed max-w-sm">
-              Our AI finds highest-rated caregivers in your area based on your
-              pet's needs, routines and care profile.
+              Our AI finds the highest-rated caregivers in your area based on
+              your pet's needs, routines, and care profile.
             </p>
             <ul className="mt-3 space-y-1">
               {[
@@ -322,13 +322,30 @@ function OwnerDashboard() {
                           ? "bg-green-100 text-green-700"
                           : booking.status === "pending"
                             ? "bg-amber-100 text-amber-700"
-                            : booking.status === "completed"
-                              ? "bg-stone-100 text-stone-500"
-                              : "bg-red-100 text-red-500"
+                            : booking.status === "awaiting_payment"
+                              ? "bg-orange-100 text-orange-700"
+                              : booking.status === "completed"
+                                ? "bg-stone-100 text-stone-500"
+                                : "bg-red-100 text-red-500"
                       }`}
                     >
-                      {booking.status}
+                      {booking.status === "awaiting_payment"
+                        ? "Awaiting Payment"
+                        : booking.status}
                     </span>
+                    {booking.status === "awaiting_payment" && (
+                      <button
+                        onClick={() => navigate(`/book/${booking.sitter_id}`)}
+                        className="text-xs font-medium px-3 py-1 rounded-full bg-amber-500 hover:bg-amber-600 text-white cursor-pointer"
+                      >
+                        Complete Payment
+                      </button>
+                    )}
+                    {booking.status === "cancelled" && (
+                      <span className="text-xs font-medium px-3 py-1 rounded-full bg-blue-50 text-blue-600">
+                        Refunded
+                      </span>
+                    )}
                     {booking.status === "completed" && !booking.has_review && (
                       <button
                         onClick={() => navigate(`/review/${booking.id}`)}
@@ -600,31 +617,30 @@ function SitterDashboard() {
                         <p className="text-xs text-stone-400">
                           {new Date(booking.start_date).toLocaleDateString(
                             "en-GB",
-                            {
-                              day: "numeric",
-                              month: "long",
-                              year: "numeric",
-                            },
+                            { day: "numeric", month: "long", year: "numeric" },
                           )}
                           {" → "}
                           {new Date(booking.end_date).toLocaleDateString(
                             "en-GB",
-                            {
-                              day: "numeric",
-                              month: "long",
-                              year: "numeric",
-                            },
+                            { day: "numeric", month: "long", year: "numeric" },
                           )}
                         </p>
-                        <span
-                          className={`inline-block mt-1 text-xs font-medium px-3 py-0.5 rounded-full capitalize ${
-                            booking.status === "completed"
-                              ? "bg-stone-100 text-stone-500"
-                              : "bg-red-100 text-red-500"
-                          }`}
-                        >
-                          {booking.status}
-                        </span>
+                        <div className="flex items-center gap-2 justify-end mt-1">
+                          <span
+                            className={`text-xs font-medium px-3 py-0.5 rounded-full capitalize ${
+                              booking.status === "completed"
+                                ? "bg-stone-100 text-stone-500"
+                                : "bg-red-100 text-red-500"
+                            }`}
+                          >
+                            {booking.status}
+                          </span>
+                          {booking.status === "cancelled" && (
+                            <span className="text-xs font-medium px-3 py-0.5 rounded-full bg-blue-50 text-blue-600">
+                              Refunded
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </li>

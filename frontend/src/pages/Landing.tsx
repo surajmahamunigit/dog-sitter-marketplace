@@ -24,7 +24,7 @@ export default function Landing() {
         </h1>
 
         {/* Subtext */}
-        <p className="text-base text-stone-500 leading-relaxed mb-8 max-w-lg mx-auto">
+        <p className="text-base text-stone-800 leading-relaxed mb-8 max-w-lg mx-auto">
           Find trusted sitters, manage personalized care instructions, and
           provide AI-guided support for every stay.
         </p>
@@ -87,7 +87,7 @@ export default function Landing() {
             <h3 className="text-sm font-bold text-stone-900 mb-2">
               {card.title}
             </h3>
-            <p className="text-xs text-stone-500 leading-relaxed">
+            <p className="text-xs text-stone-700 leading-relaxed">
               {card.desc}
             </p>
           </div>

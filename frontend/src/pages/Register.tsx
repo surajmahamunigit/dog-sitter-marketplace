@@ -7,7 +7,10 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"owner" | "sitter">("owner");
+  const searchParams = new URLSearchParams(window.location.search);
+  const initialRole =
+    searchParams.get("role") === "sitter" ? "sitter" : "owner";
+  const [role, setRole] = useState<"owner" | "sitter">(initialRole);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -78,7 +81,7 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-amber-800 mb-1">
+            <label className="block text-sm font-medium text-amber-800 mb-2">
               Email
             </label>
             <input
@@ -92,7 +95,7 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-amber-800 mb-1">
+            <label className="block text-sm font-medium text-amber-800 mb-2">
               Password
             </label>
             <input
@@ -106,31 +109,86 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-amber-800 mb-1">
-              I want to
+            <label className="block text-sm font-medium text-amber-800 mb-3">
+              Select your account type
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-3">
               <button
                 type="button"
                 onClick={() => setRole("owner")}
-                className={`py-2.5 rounded-full text-sm font-medium border transition-colors ${
+                className={`w-full text-left rounded-2xl border px-4 py-3 transition-colors cursor-pointer ${
                   role === "owner"
-                    ? "bg-amber-500 text-white border-amber-500"
-                    : "bg-white text-stone-600 border-stone-300 hover:border-amber-400"
+                    ? "border-amber-600 bg-amber-50 border-2"
+                    : "border-stone-200 bg-white hover:border-stone-300"
                 }`}
               >
-                Find a sitter
+                <div className="flex items-center gap-2 mb-1">
+                  {role === "owner" ? (
+                    <div className="w-4 h-4 rounded-full bg-amber-700 flex items-center justify-center flex-shrink-0">
+                      <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                        <path
+                          d="M1.5 5L4 7.5L8.5 2.5"
+                          stroke="white"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="w-4 h-4 rounded-full border-2 border-stone-300 flex-shrink-0" />
+                  )}
+                  <span className="text-lg">🐶</span>
+                  <span
+                    className={`text-sm font-medium ${role === "owner" ? "text-amber-800" : "text-stone-800"}`}
+                  >
+                    Pet Owner
+                  </span>
+                </div>
+                <p
+                  className={`text-xs pl-6 leading-relaxed ${role === "owner" ? "text-amber-700" : "text-stone-400"}`}
+                >
+                  Find AI-matched sitters for your dog.
+                </p>
               </button>
+
               <button
                 type="button"
                 onClick={() => setRole("sitter")}
-                className={`py-2.5 rounded-full text-sm font-medium border transition-colors ${
+                className={`w-full text-left rounded-2xl border px-4 py-3 transition-colors cursor-pointer ${
                   role === "sitter"
-                    ? "bg-amber-500 text-white border-amber-500"
-                    : "bg-white text-amber-800 border-stone-300 hover:border-amber-400"
+                    ? "border-amber-600 bg-amber-50 border-2"
+                    : "border-stone-200 bg-white hover:border-stone-300"
                 }`}
               >
-                Become a sitter
+                <div className="flex items-center gap-2 mb-1">
+                  {role === "sitter" ? (
+                    <div className="w-4 h-4 rounded-full bg-amber-700 flex items-center justify-center flex-shrink-0">
+                      <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                        <path
+                          d="M1.5 5L4 7.5L8.5 2.5"
+                          stroke="white"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="w-4 h-4 rounded-full border-2 border-stone-300 flex-shrink-0" />
+                  )}
+                  <span className="text-lg">🦮</span>
+                  <span
+                    className={`text-sm font-medium ${role === "sitter" ? "text-amber-800" : "text-stone-800"}`}
+                  >
+                    Pet Sitter
+                  </span>
+                </div>
+                <p
+                  className={`text-xs pl-6 leading-relaxed ${role === "sitter" ? "text-amber-700" : "text-stone-400"}`}
+                >
+                  Get matched with pets that fit your experience.
+                </p>
               </button>
             </div>
           </div>

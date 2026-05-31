@@ -14,7 +14,7 @@ export default function Navbar() {
   return (
     <nav className="w-full border-b border-stone-200 bg-white px-6 py-4 flex items-center justify-between">
       <Link to="/" className="text-xl font-bold text-amber-600">
-        PawSitter
+        🐾 PawSitter
       </Link>
 
       <div className="flex items-center gap-4">

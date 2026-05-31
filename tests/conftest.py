@@ -57,3 +57,14 @@ async def client():
 
     app.dependency_overrides.clear()
     await engine.dispose()
+
+
+async def set_booking_status(booking_id: str, status: str):
+    """Directly set booking status in DB — test setup only, simulates Stripe webhook."""
+    engine = create_async_engine(TEST_DATABASE_URL, echo=False)
+    async with engine.begin() as conn:
+        await conn.execute(
+            text("UPDATE bookings SET status = :status WHERE id = :id"),
+            {"status": status, "id": booking_id},
+        )
+    await engine.dispose()

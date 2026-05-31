@@ -1,5 +1,6 @@
 import pytest
 from datetime import date, timedelta
+from tests.conftest import set_booking_status
 
 
 async def _register_and_login(client, email, role):
@@ -59,7 +60,7 @@ async def test_create_booking_happy_path(client):
 
     assert response.status_code == 201
     data = response.json()
-    assert data["status"] == "pending"
+    assert data["status"] == "awaiting_payment"
     assert data["sitter_id"] == sitter_id
     assert data["dog_id"] == dog_id
 
@@ -70,7 +71,6 @@ async def test_booking_status_transition(client):
     sitter_token = await _register_and_login(client, "sitter_status@test.com", "sitter")
 
     sitters_response = await client.get("/sitters/")
-    # Find our specific sitter by email
     sitters = sitters_response.json()
     sitter = next(s for s in sitters if s["email"] == "sitter_status@test.com")
     sitter_id = sitter["id"]
@@ -96,6 +96,9 @@ async def test_booking_status_transition(client):
         headers={"Authorization": f"Bearer {owner_token}"},
     )
     booking_id = booking_response.json()["id"]
+
+    # Simulate Stripe webhook — advance awaiting_payment → pending
+    await set_booking_status(booking_id, "pending")
 
     # Sitter confirms
     confirm_response = await client.patch(
