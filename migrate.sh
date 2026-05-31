@@ -17,9 +17,9 @@ url = os.environ.get('SYNC_DATABASE_URL')
 print('SYNC_URL set:', bool(url))
 conn = psycopg2.connect(url)
 cur = conn.cursor()
-cur.execute(\"SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename\")
-tables = [t[0] for t in cur.fetchall()]
-print('Tables:', tables)
+cur.execute(\"SELECT schemaname, tablename FROM pg_tables WHERE schemaname NOT IN ('pg_catalog', 'information_schema') ORDER BY schemaname, tablename\")
+tables = cur.fetchall()
+print('All tables:', tables)
 conn.close()
 "
 echo "Verify exit code: $?"
