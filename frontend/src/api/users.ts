@@ -2,6 +2,8 @@ import apiClient from "./client"
 import type { User } from "../types"
 
 export interface UpdateMeData {
+    name?: string
+    email?: string
     bio?: string
     location?: {
         city?: string

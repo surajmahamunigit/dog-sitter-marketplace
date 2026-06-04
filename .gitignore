@@ -30,3 +30,6 @@ alembic.ini
 
 # Node
 node_modules/
+
+# Production environment variables
+frontend/.env.production

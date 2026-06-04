@@ -1,9 +1,6 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 
 export default function Landing() {
-  const { isAuthenticated } = useAuth();
-
   return (
     <div className="min-h-screen bg-stone-50">
       {/* Hero */}
