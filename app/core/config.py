@@ -39,3 +39,6 @@ ANTHROPIC_API_KEY: str = _require("ANTHROPIC_API_KEY")
 
 # OpenAI
 OPENAI_API_KEY: str = _require("OPENAI_API_KEY")
+
+# Frontend
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
