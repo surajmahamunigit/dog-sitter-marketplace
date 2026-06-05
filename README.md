@@ -18,37 +18,38 @@ PawSitter is a two-sided marketplace where dog owners find, book, and pay sitter
 flowchart TD
     Browser([Browser])
 
-    subgraph AWS_FE["AWS — Frontend"]
+    subgraph Frontend["AWS Frontend"]
         CF[CloudFront CDN]
-        S3[(S3 · private bucket)]
+        S3[(S3 private bucket)]
     end
 
     subgraph FlyIO["Fly.io"]
-        API["FastAPI · app process"]
-        Worker["SQS Worker · worker process"]
+        API["FastAPI app process"]
+        Worker["SQS Worker process"]
     end
 
-    subgraph SupabaseDB["Supabase"]
-        DB[("PostgreSQL + pgvector")]
+    subgraph Database["Supabase"]
+        DB[(PostgreSQL plus pgvector)]
     end
 
-    subgraph AI["AI Services"]
-        Claude["Anthropic · Claude Sonnet"]
-        OAI["OpenAI · text-embedding-3-small"]
+    subgraph AIServices["AI Services"]
+        Claude["Anthropic Claude Sonnet"]
+        OAI["OpenAI text-embedding-3-small"]
     end
 
-    Stripe([Stripe · Checkout + Connect])
-    SQS["AWS SQS · 2 queues + DLQs"]
+    Stripe([Stripe Checkout and Connect])
+    SQS["AWS SQS - 2 queues plus DLQs"]
     CW["AWS CloudWatch"]
 
     Browser -->|static assets| CF
     CF --> S3
     Browser -->|API calls| API
 
-    API -->|matching + RAG generation| Claude
+    API -->|matching and RAG generation| Claude
     API -->|RAG query embedding| OAI
-    API <-->|webhook| Stripe
-    API <-->|read/write| DB
+    API -->|create checkout session| Stripe
+    Stripe -->|webhook event| API
+    API -->|read and write| DB
 
     API -->|fire and return| SQS
     SQS --> Worker
@@ -56,8 +57,8 @@ flowchart TD
     Worker -->|summarize reviews| Claude
     Worker -->|write back| DB
 
-    API -.->|logs| CW
-    Worker -.->|logs| CW
+    API -.->|structured logs| CW
+    Worker -.->|structured logs| CW
 ```
 
 ---
