@@ -21,6 +21,7 @@ dependencies = [
     "starlette==0.46.2",
     "stripe>=15.1.0",
     "uvicorn[standard]>=0.46.0",
+    "watchtower>=3.4.0",
 ]
 
 [dependency-groups]

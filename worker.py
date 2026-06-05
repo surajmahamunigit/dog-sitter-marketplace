@@ -14,12 +14,9 @@ from app.core.config import (
 from app.core.database import AsyncSessionLocal
 from app.services.embedding_service import index_care_instructions
 from app.services.review_service import _regenerate_ai_summary
+from app.core.logging_config import setup_logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(threadName)s %(message)s",
-)
-logger = logging.getLogger(__name__)
+logger = setup_logging("/pawsitter/worker", "pawsitter.worker")
 
 sqs = boto3.client("sqs", region_name=AWS_REGION)
 

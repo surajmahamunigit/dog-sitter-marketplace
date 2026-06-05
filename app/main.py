@@ -16,6 +16,10 @@ from app.routes import (
     rag,
     reviews,
 )
+from app.core.logging_config import setup_logging
+
+logger = setup_logging("/pawsitter/api", "pawsitter.api")
+logger.info("PawSitter API starting up")
 
 app = FastAPI()
 
