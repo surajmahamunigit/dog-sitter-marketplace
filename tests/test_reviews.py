@@ -85,12 +85,7 @@ async def test_create_review_happy_path(client: AsyncClient):
         client, owner_token, sitter_token, sitter_id
     )
 
-    with patch("app.services.review_service.anthropic.Anthropic") as mock_anthropic:
-        mock_client = MagicMock()
-        mock_anthropic.return_value = mock_client
-        mock_client.messages.create.return_value = MagicMock(
-            content=[MagicMock(text="Great sitter, owners love them.")]
-        )
+    with patch("app.services.review_service.send_message"):
         resp = await client.post(
             f"/reviews/?booking_id={booking['booking_id']}",
             json={"rating": 5, "body": "Excellent sitter!"},
@@ -114,12 +109,7 @@ async def test_duplicate_review_blocked(client: AsyncClient):
     )
     headers = {"Authorization": f"Bearer {owner_token}"}
 
-    with patch("app.services.review_service.anthropic.Anthropic") as mock_anthropic:
-        mock_client = MagicMock()
-        mock_anthropic.return_value = mock_client
-        mock_client.messages.create.return_value = MagicMock(
-            content=[MagicMock(text="Great sitter.")]
-        )
+    with patch("app.services.review_service.send_message"):
         # First review
         await client.post(
             f"/reviews/?booking_id={booking['booking_id']}",
@@ -139,6 +129,7 @@ async def test_duplicate_review_blocked(client: AsyncClient):
 
 @pytest.mark.asyncio
 async def test_ai_summary_generated_after_review(client: AsyncClient):
+    """Posting a review triggers an SQS message for async AI summary generation."""
     owner_token = await _register_and_login(client, "reviewer3@test.com", "owner")
     sitter_token = await _register_and_login(client, "sitter3@test.com", "sitter")
     sitter_id = await _get_user_id(client, sitter_token)
@@ -147,19 +138,16 @@ async def test_ai_summary_generated_after_review(client: AsyncClient):
         client, owner_token, sitter_token, sitter_id
     )
 
-    with patch("app.services.review_service.anthropic.Anthropic") as mock_anthropic:
-        mock_client = MagicMock()
-        mock_anthropic.return_value = mock_client
-        mock_client.messages.create.return_value = MagicMock(
-            content=[MagicMock(text="Owners consistently praise this sitter.")]
-        )
-        await client.post(
+    with patch("app.services.review_service.send_message") as mock_send:
+        resp = await client.post(
             f"/reviews/?booking_id={booking['booking_id']}",
             json={"rating": 5, "body": "Amazing with my dog!"},
             headers={"Authorization": f"Bearer {owner_token}"},
         )
 
-    sitter_profile = await client.get(f"/sitters/{sitter_id}")
-    assert (
-        sitter_profile.json()["ai_summary"] == "Owners consistently praise this sitter."
-    )
+    assert resp.status_code == 201
+    assert resp.json()["rating"] == 5
+    # Verify review triggers async AI summary generation via SQS
+    mock_send.assert_called_once()
+    _, payload = mock_send.call_args[0]
+    assert "sitter_id" in payload

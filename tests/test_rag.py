@@ -1,7 +1,10 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from httpx import AsyncClient
-
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from app.services.embedding_service import index_care_instructions
+from tests.conftest import TEST_DATABASE_URL
 from app.services.embedding_service import chunk_text
 from tests.conftest import set_booking_status
 
@@ -106,13 +109,13 @@ async def test_rag_requires_completed_embeddings(client: AsyncClient):
         headers={"Authorization": f"Bearer {sitter_token}"},
     )
 
-    with patch("app.services.care_instruction_service.index_care_instructions"):
+    # test_rag_requires_completed_embeddings
+    with patch("app.services.care_instruction_service.send_message"):
         await client.post(
             f"/care-instructions/{dog_id}",
             json={"content": "Feed him once a day."},
             headers={"Authorization": f"Bearer {owner_token}"},
         )
-
     response = await client.post(
         "/rag/ask",
         json={"dog_id": dog_id, "question": "How much food?"},
@@ -172,13 +175,21 @@ async def test_rag_returns_answer(client: AsyncClient):
     mock_embed_response = MagicMock()
     mock_embed_response.data = [MagicMock(embedding=fake_embedding)]
 
-    with patch("app.services.embedding_service.openai_client") as mock_openai:
-        mock_openai.embedding.create.return_value = mock_embed_response
-        await client.post(
+    with patch("app.services.care_instruction_service.send_message"):
+        ci_resp = await client.post(
             f"/care-instructions/{dog_id}",
             json={"content": "feed macdog once a day at 6pm"},
             headers={"Authorization": f"Bearer {owner_token}"},
         )
+    care_instruction_id = ci_resp.json()["id"]
+
+    engine = create_async_engine(TEST_DATABASE_URL)
+    SeedSession = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
+    with patch("app.services.embedding_service.openai_client") as mock_openai:
+        mock_openai.embeddings.create.return_value = mock_embed_response
+        async with SeedSession() as db:
+            await index_care_instructions(db, str(care_instruction_id))
+    await engine.dispose()
 
     mock_claude_response = MagicMock()
     mock_claude_response.content = [MagicMock(text="Feed MockDog once a day at noon.")]
