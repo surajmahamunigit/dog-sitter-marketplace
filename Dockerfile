@@ -12,6 +12,7 @@ COPY app/ ./app/
 COPY migrations/ ./migrations/
 COPY alembic.ini ./
 COPY migrate.sh ./
+COPY worker.py ./
 
 EXPOSE 8000
 
