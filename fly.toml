@@ -5,7 +5,7 @@ primary_region = 'lax'
 
 [processes]
   app = "uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2"
-  worker = "python worker.py"
+  worker = "uv run python worker.py"
 
 [deploy]
   release_command = "sh migrate.sh"
