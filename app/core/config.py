@@ -42,3 +42,8 @@ OPENAI_API_KEY: str = _require("OPENAI_API_KEY")
 
 # Frontend
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+# AWS SQS
+SQS_EMBEDDING_QUEUE_URL = os.getenv("SQS_EMBEDDING_QUEUE_URL", "")
+SQS_REVIEW_SUMMARY_QUEUE_URL = os.getenv("SQS_REVIEW_SUMMARY_QUEUE_URL", "")
+AWS_REGION = os.getenv("AWS_REGION", "us-east-1")

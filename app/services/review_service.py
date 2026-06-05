@@ -8,6 +8,8 @@ from app.models.booking import Booking
 from app.models.review import Review
 from app.schemas.review import ReviewCreate
 from app.core import config
+from app.services.sqs_service import send_message
+from app.core.config import SQS_REVIEW_SUMMARY_QUEUE_URL
 
 
 async def create_review(
@@ -45,7 +47,10 @@ async def create_review(
     await db.refresh(review)
 
     # 4. Regenerate AI summary for the sitter
-    await _regenerate_ai_summary(db, booking.sitter_id)
+    send_message(
+        SQS_REVIEW_SUMMARY_QUEUE_URL,
+        {"sitter_id": str(booking.sitter_id)},
+    )
 
     return review
 
@@ -72,8 +77,8 @@ async def _regenerate_ai_summary(db: AsyncSession, sitter_id: UUID) -> None:
     # Build review list for the prompt
     review_text = "\n".join(f'- Rating: {r.rating}/5. "{r.body}"' for r in reviews)
 
-    client = anthropic.Anthropic(api_key=config.ANTHROPIC_API_KEY)
-    message = client.messages.create(
+    client = anthropic.AsyncAnthropic(api_key=config.ANTHROPIC_API_KEY)
+    message = await client.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=300,
         temperature=0.7,

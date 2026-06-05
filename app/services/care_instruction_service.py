@@ -3,7 +3,8 @@ from sqlalchemy import select
 from app.models.care_instruction import CareInstruction
 import uuid
 from datetime import datetime, timezone
-from app.services.embedding_service import index_care_instructions
+from app.services.sqs_service import send_message
+from app.core.config import SQS_EMBEDDING_QUEUE_URL
 
 
 async def upsert_care_instructions(
@@ -35,8 +36,10 @@ async def upsert_care_instructions(
     await db.refresh(record)
 
     # trigger embedding pipeline
-    await index_care_instructions(db, record.id)
-    await db.refresh(record)  # pick up completed status
+    send_message(
+        SQS_EMBEDDING_QUEUE_URL,
+        {"care_instruction_id": str(record.id)},
+    )
 
     return record
 
