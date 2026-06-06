@@ -14,52 +14,7 @@ PawSitter is a two-sided marketplace where dog owners find, book, and pay sitter
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    Browser([Browser])
-
-    subgraph Frontend["AWS Frontend"]
-        CF[CloudFront CDN]
-        S3[(S3 private bucket)]
-    end
-
-    subgraph FlyIO["Fly.io"]
-        API["FastAPI app process"]
-        Worker["SQS Worker process"]
-    end
-
-    subgraph Database["Supabase"]
-        DB[(PostgreSQL plus pgvector)]
-    end
-
-    subgraph AIServices["AI Services"]
-        Claude["Anthropic Claude Sonnet"]
-        OAI["OpenAI text-embedding-3-small"]
-    end
-
-    Stripe([Stripe Checkout and Connect])
-    SQS["AWS SQS - 2 queues plus DLQs"]
-    CW["AWS CloudWatch"]
-
-    Browser -->|static assets| CF
-    CF --> S3
-    Browser -->|API calls| API
-
-    API -->|matching and RAG generation| Claude
-    API -->|RAG query embedding| OAI
-    API -->|create checkout session| Stripe
-    Stripe -->|webhook event| API
-    API -->|read and write| DB
-
-    API -->|fire and return| SQS
-    SQS --> Worker
-    Worker -->|index care instructions| OAI
-    Worker -->|summarize reviews| Claude
-    Worker -->|write back| DB
-
-    API -.->|structured logs| CW
-    Worker -.->|structured logs| CW
-```
+![PawSitter System Architecture](docs/architecture.svg)
 
 ---
 

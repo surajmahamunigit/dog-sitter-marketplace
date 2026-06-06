@@ -1,0 +1,238 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <rect width="1400" height="900" fill="#FAFBFC"/>
+
+  <defs>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.10"/>
+    </filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#374151"/>
+    </marker>
+    <marker id="arrow-dashed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#6B7280"/>
+    </marker>
+    <marker id="arrow-light" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#9CA3AF"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="700" y="44" text-anchor="middle" font-size="22" font-weight="700" fill="#0F172A">PawSitter — System Architecture</text>
+  <text x="700" y="68" text-anchor="middle" font-size="13" fill="#64748B">Two-sided marketplace with synchronous + asynchronous AI pipelines</text>
+
+  <!-- ============ TIER 1: USER ============ -->
+  <g filter="url(#shadow)">
+    <rect x="600" y="100" width="200" height="60" rx="8" fill="#FFFFFF" stroke="#94A3B8" stroke-width="1.5"/>
+    <text x="700" y="126" text-anchor="middle" font-size="15" font-weight="600" fill="#0F172A">User Browser</text>
+    <text x="700" y="146" text-anchor="middle" font-size="11" fill="#64748B">React + TypeScript SPA</text>
+  </g>
+
+  <!-- ============ TIER 2: COLUMNS ============ -->
+
+  <!-- LEFT COLUMN: AWS Edge -->
+  <rect x="60" y="210" width="280" height="430" rx="10" fill="#FFFBEB" stroke="#FCD34D" stroke-width="1.2"/>
+  <text x="78" y="234" font-size="11" font-weight="700" fill="#92400E" letter-spacing="1.5">AWS · EDGE DELIVERY</text>
+
+  <!-- CloudFront -->
+  <g filter="url(#shadow)">
+    <rect x="100" y="260" width="200" height="84" rx="8" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2"/>
+    <text x="200" y="286" text-anchor="middle" font-size="14" font-weight="700" fill="#0F172A">CloudFront</text>
+    <text x="200" y="306" text-anchor="middle" font-size="11" fill="#64748B">CDN · HTTPS edge cache</text>
+    <text x="200" y="324" text-anchor="middle" font-size="11" fill="#64748B">global distribution</text>
+  </g>
+
+  <!-- S3 (cylinder) -->
+  <g filter="url(#shadow)">
+    <path d="M 110 410 L 110 488 Q 110 500 200 500 Q 290 500 290 488 L 290 410 Q 290 422 200 422 Q 110 422 110 410 Z" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2"/>
+    <ellipse cx="200" cy="410" rx="90" ry="12" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2"/>
+    <text x="200" y="450" text-anchor="middle" font-size="14" font-weight="700" fill="#0F172A">S3</text>
+    <text x="200" y="470" text-anchor="middle" font-size="11" fill="#64748B">private bucket · OAC</text>
+    <text x="200" y="486" text-anchor="middle" font-size="11" fill="#64748B">React build artifacts</text>
+  </g>
+
+  <!-- CloudFront → S3 (origin fetch) -->
+  <line x1="200" y1="344" x2="200" y2="404" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="212" y="378" font-size="10" fill="#475569" font-style="italic">origin fetch</text>
+
+  <!-- MIDDLE COLUMN: Fly.io -->
+  <rect x="460" y="210" width="280" height="500" rx="10" fill="#EFF6FF" stroke="#93C5FD" stroke-width="1.2"/>
+  <text x="478" y="234" font-size="11" font-weight="700" fill="#1E40AF" letter-spacing="1.5">FLY.IO · APPLICATION</text>
+
+  <!-- FastAPI -->
+  <g filter="url(#shadow)">
+    <rect x="490" y="260" width="220" height="110" rx="8" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <text x="600" y="286" text-anchor="middle" font-size="14" font-weight="700" fill="#0F172A">FastAPI</text>
+    <text x="600" y="306" text-anchor="middle" font-size="11" fill="#64748B">app process · sync API handler</text>
+    <text x="600" y="324" text-anchor="middle" font-size="11" fill="#64748B">25 REST endpoints</text>
+    <text x="600" y="342" text-anchor="middle" font-size="11" fill="#64748B">JWT auth · RBAC · validation</text>
+    <text x="600" y="360" text-anchor="middle" font-size="11" fill="#64748B">async SQLAlchemy + asyncpg</text>
+  </g>
+
+  <!-- SQS (parallelogram) -->
+  <g filter="url(#shadow)">
+    <path d="M 510 430 L 720 430 L 700 478 L 490 478 Z" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2"/>
+    <text x="600" y="455" text-anchor="middle" font-size="14" font-weight="700" fill="#0F172A">AWS SQS</text>
+    <text x="600" y="471" text-anchor="middle" font-size="11" fill="#64748B">2 queues · dead-letter queues</text>
+  </g>
+
+  <!-- Worker -->
+  <g filter="url(#shadow)">
+    <rect x="490" y="528" width="220" height="110" rx="8" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+    <text x="600" y="554" text-anchor="middle" font-size="14" font-weight="700" fill="#0F172A">SQS Worker</text>
+    <text x="600" y="574" text-anchor="middle" font-size="11" fill="#64748B">worker process · async pipelines</text>
+    <text x="600" y="592" text-anchor="middle" font-size="11" fill="#64748B">2 daemon threads · long polling</text>
+    <text x="600" y="610" text-anchor="middle" font-size="11" fill="#64748B">embedding indexing</text>
+    <text x="600" y="628" text-anchor="middle" font-size="11" fill="#64748B">async review summarization</text>
+  </g>
+
+  <!-- FastAPI → SQS (enqueue) -->
+  <line x1="600" y1="370" x2="600" y2="426" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="612" y="402" font-size="10" fill="#475569" font-style="italic">enqueue</text>
+
+  <!-- SQS → Worker (consume) -->
+  <line x1="600" y1="478" x2="600" y2="524" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="612" y="506" font-size="10" fill="#475569" font-style="italic">consume</text>
+
+  <!-- RIGHT COLUMN: External Services -->
+  <rect x="860" y="210" width="320" height="500" rx="10" fill="#FAF5FF" stroke="#D8B4FE" stroke-width="1.2"/>
+  <text x="878" y="234" font-size="11" font-weight="700" fill="#6B21A8" letter-spacing="1.5">THIRD-PARTY SERVICES</text>
+
+  <!-- Stripe -->
+  <g filter="url(#shadow)">
+    <rect x="890" y="260" width="260" height="100" rx="8" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2"/>
+    <text x="1020" y="286" text-anchor="middle" font-size="14" font-weight="700" fill="#0F172A">Stripe</text>
+    <text x="1020" y="306" text-anchor="middle" font-size="11" fill="#64748B">Checkout Sessions · Connect Express</text>
+    <text x="1020" y="324" text-anchor="middle" font-size="11" fill="#64748B">webhook-driven payment lifecycle</text>
+    <text x="1020" y="342" text-anchor="middle" font-size="11" fill="#64748B">SAQ-A PCI compliance tier</text>
+  </g>
+
+  <!-- AI Services sub-group -->
+  <rect x="880" y="395" width="280" height="295" rx="8" fill="#F3E8FF" stroke="#C4B5FD" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="898" y="416" font-size="10" font-weight="700" fill="#6B21A8" letter-spacing="1">AI SERVICES</text>
+
+  <!-- Anthropic -->
+  <g filter="url(#shadow)">
+    <rect x="900" y="430" width="240" height="110" rx="8" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2"/>
+    <text x="1020" y="456" text-anchor="middle" font-size="14" font-weight="700" fill="#0F172A">Anthropic</text>
+    <text x="1020" y="476" text-anchor="middle" font-size="11" fill="#64748B">claude-sonnet</text>
+    <text x="1020" y="494" text-anchor="middle" font-size="11" fill="#64748B">sitter matching (sync)</text>
+    <text x="1020" y="512" text-anchor="middle" font-size="11" fill="#64748B">RAG generation (sync)</text>
+    <text x="1020" y="530" text-anchor="middle" font-size="11" fill="#64748B">review summaries (async)</text>
+  </g>
+
+  <!-- OpenAI -->
+  <g filter="url(#shadow)">
+    <rect x="900" y="565" width="240" height="110" rx="8" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2"/>
+    <text x="1020" y="591" text-anchor="middle" font-size="14" font-weight="700" fill="#0F172A">OpenAI</text>
+    <text x="1020" y="611" text-anchor="middle" font-size="11" fill="#64748B">text-embedding-3-small</text>
+    <text x="1020" y="629" text-anchor="middle" font-size="11" fill="#64748B">1536-dim vectors</text>
+    <text x="1020" y="647" text-anchor="middle" font-size="11" fill="#64748B">RAG query embed (sync)</text>
+    <text x="1020" y="665" text-anchor="middle" font-size="11" fill="#64748B">care-instruction index (async)</text>
+  </g>
+
+  <!-- ============ TIER 3: DATA & OBSERVABILITY ============ -->
+  <rect x="60" y="750" width="1120" height="120" rx="10" fill="#ECFDF5" stroke="#86EFAC" stroke-width="1.2"/>
+  <text x="78" y="774" font-size="11" font-weight="700" fill="#065F46" letter-spacing="1.5">DATA &amp; OBSERVABILITY</text>
+
+  <!-- PostgreSQL (cylinder) -->
+  <g filter="url(#shadow)">
+    <path d="M 220 800 L 220 852 Q 220 864 350 864 Q 480 864 480 852 L 480 800 Q 480 812 350 812 Q 220 812 220 800 Z" fill="#FFFFFF" stroke="#059669" stroke-width="2"/>
+    <ellipse cx="350" cy="800" rx="130" ry="12" fill="#FFFFFF" stroke="#059669" stroke-width="2"/>
+    <text x="350" y="826" text-anchor="middle" font-size="14" font-weight="700" fill="#0F172A">PostgreSQL + pgvector</text>
+    <text x="350" y="846" text-anchor="middle" font-size="11" fill="#64748B">Supabase · 8 tables · 1536-dim vectors</text>
+  </g>
+
+  <!-- CloudWatch -->
+  <g filter="url(#shadow)">
+    <rect x="690" y="794" width="280" height="70" rx="8" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2"/>
+    <text x="830" y="820" text-anchor="middle" font-size="14" font-weight="700" fill="#0F172A">AWS CloudWatch</text>
+    <text x="830" y="838" text-anchor="middle" font-size="11" fill="#64748B">structured logs · 2 log groups</text>
+    <text x="830" y="854" text-anchor="middle" font-size="11" fill="#64748B">/pawsitter/api · /pawsitter/worker</text>
+  </g>
+
+  <!-- ============ ARROWS ============ -->
+
+  <!-- User → CloudFront (static assets) -->
+  <path d="M 640 160 Q 540 180 320 240 L 280 258" fill="none" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="420" y="200" font-size="11" fill="#475569" font-style="italic">static assets</text>
+
+  <!-- User → FastAPI (REST API) -->
+  <line x1="700" y1="160" x2="700" y2="256" stroke="#374151" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="712" y="200" font-size="11" font-weight="600" fill="#1E40AF">REST API · JSON</text>
+
+  <!-- FastAPI ↔ Stripe (checkout + webhook) -->
+  <line x1="710" y1="290" x2="886" y2="290" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="745" y="282" font-size="10" fill="#475569" font-style="italic">create session</text>
+
+  <line x1="886" y1="320" x2="710" y2="320" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="745" y="338" font-size="10" fill="#475569" font-style="italic">webhook event</text>
+
+  <!-- FastAPI → AI Services (sync) - exits right side of FastAPI -->
+  <path d="M 710 350 Q 800 350 820 430 L 876 460" fill="none" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="752" y="402" font-size="10" font-weight="600" fill="#1E40AF">sync · matching + RAG</text>
+
+  <!-- Worker → AI Services (async) - exits right side of Worker -->
+  <path d="M 710 580 Q 800 580 820 610 L 876 610" fill="none" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+  <text x="752" y="572" font-size="10" font-weight="600" fill="#6B21A8">async · embed + summarize</text>
+
+  <!-- FastAPI → Postgres (read/write) -->
+  <path d="M 540 370 Q 540 600 380 800" fill="none" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="425" y="595" font-size="10" fill="#475569" font-style="italic" transform="rotate(-55, 425, 595)">read / write</text>
+
+  <!-- Worker → Postgres (write back) -->
+  <path d="M 540 638 Q 460 720 380 798" fill="none" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="430" y="745" font-size="10" fill="#475569" font-style="italic" transform="rotate(-45, 430, 745)">write back</text>
+
+  <!-- FastAPI → CloudWatch (logs) -->
+  <path d="M 660 370 Q 700 600 760 794" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-light)"/>
+  <text x="710" y="700" font-size="10" fill="#6B7280" font-style="italic">logs</text>
+
+  <!-- Worker → CloudWatch (logs) -->
+  <path d="M 670 638 Q 720 720 800 794" fill="none" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-light)"/>
+  <text x="740" y="752" font-size="10" fill="#6B7280" font-style="italic">logs</text>
+
+  <!-- ============ LEGEND ============ -->
+  <rect x="1210" y="210" width="170" height="500" rx="8" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="1225" y="234" font-size="11" font-weight="700" fill="#374151" letter-spacing="1">LEGEND</text>
+
+  <text x="1225" y="262" font-size="10" font-weight="700" fill="#475569" letter-spacing="0.5">FLOWS</text>
+
+  <line x1="1225" y1="280" x2="1265" y2="280" stroke="#374151" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="1275" y="284" font-size="10" fill="#374151">Synchronous</text>
+
+  <line x1="1225" y1="302" x2="1265" y2="302" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+  <text x="1275" y="306" font-size="10" fill="#374151">Async / queued</text>
+
+  <line x1="1225" y1="324" x2="1265" y2="324" stroke="#9CA3AF" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow-light)"/>
+  <text x="1275" y="328" font-size="10" fill="#374151">Observability</text>
+
+  <text x="1225" y="362" font-size="10" font-weight="700" fill="#475569" letter-spacing="0.5">COMPONENTS</text>
+
+  <rect x="1225" y="374" width="14" height="14" rx="2" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2"/>
+  <text x="1247" y="385" font-size="10" fill="#374151">AWS-managed</text>
+
+  <rect x="1225" y="396" width="14" height="14" rx="2" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2"/>
+  <text x="1247" y="407" font-size="10" fill="#374151">Third-party API</text>
+
+  <rect x="1225" y="418" width="14" height="14" rx="2" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>
+  <text x="1247" y="429" font-size="10" fill="#374151">Application service</text>
+
+  <rect x="1225" y="440" width="14" height="14" rx="2" fill="#FFFFFF" stroke="#059669" stroke-width="2"/>
+  <text x="1247" y="451" font-size="10" fill="#374151">Data store</text>
+
+  <text x="1225" y="486" font-size="10" font-weight="700" fill="#475569" letter-spacing="0.5">SHAPES</text>
+  <text x="1225" y="504" font-size="10" fill="#374151">Rect = service</text>
+  <text x="1225" y="522" font-size="10" fill="#374151">Cylinder = data store</text>
+  <text x="1225" y="540" font-size="10" fill="#374151">Parallelogram = queue</text>
+
+  <text x="1225" y="576" font-size="10" font-weight="700" fill="#475569" letter-spacing="0.5">TIERS</text>
+  <rect x="1225" y="588" width="14" height="14" rx="2" fill="#FFFBEB" stroke="#FCD34D"/>
+  <text x="1247" y="599" font-size="10" fill="#374151">Edge delivery</text>
+  <rect x="1225" y="610" width="14" height="14" rx="2" fill="#EFF6FF" stroke="#93C5FD"/>
+  <text x="1247" y="621" font-size="10" fill="#374151">Application</text>
+  <rect x="1225" y="632" width="14" height="14" rx="2" fill="#FAF5FF" stroke="#D8B4FE"/>
+  <text x="1247" y="643" font-size="10" fill="#374151">External APIs</text>
+  <rect x="1225" y="654" width="14" height="14" rx="2" fill="#ECFDF5" stroke="#86EFAC"/>
+  <text x="1247" y="665" font-size="10" fill="#374151">Data &amp; logs</text>
+
+</svg>
