@@ -4,7 +4,7 @@ primary_region = 'lax'
 [build]
 
 [processes]
-  app = "uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2"
+  app = "uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2"
   worker = "uv run python worker.py"
 
 [deploy]
@@ -15,7 +15,7 @@ primary_region = 'lax'
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ['app']
 
 [[vm]]
